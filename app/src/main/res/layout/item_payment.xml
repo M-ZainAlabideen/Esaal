@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@mipmap/box_search_res">
+
+    <TextView
+        android:id="@+id/item_payment_tv_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="24dp"
+        android:text="30/6/2019"
+        style="@style/TextAppearance.AppCompat.Small"
+        android:textColor="@color/gray"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/item_payment_tv_paidWord"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/paid"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="@+id/item_payment_tv_date"
+        app:layout_constraintTop_toBottomOf="@+id/item_payment_tv_date" />
+
+    <TextView
+        android:id="@+id/item_payment_tv_cost"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:text="25.500 KD"
+        android:textColor="@color/grayDark"
+        app:layout_constraintBottom_toBottomOf="@+id/item_payment_tv_paidWord"
+        app:layout_constraintStart_toEndOf="@+id/item_payment_tv_paidWord"
+        app:layout_constraintTop_toTopOf="@+id/item_payment_tv_paidWord" />
+
+    <TextView
+        android:id="@+id/item_payment_tv_renewWord"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="32dp"
+        android:text="@string/renew"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/item_payment_tv_cost"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/item_payment_tv_cost"
+        app:layout_constraintTop_toTopOf="@+id/item_payment_tv_cost"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/item_payment_tv_fromWord"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="24dp"
+        android:text="@string/from"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/item_payment_tv_packageName"
+        app:layout_constraintTop_toBottomOf="@+id/item_payment_tv_packageName" />
+
+    <TextView
+        android:id="@+id/item_payment_tv_fromDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:text="30/6/2019"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/item_payment_tv_fromWord"
+        app:layout_constraintStart_toEndOf="@+id/item_payment_tv_fromWord"
+        app:layout_constraintTop_toTopOf="@+id/item_payment_tv_fromWord" />
+
+    <TextView
+        android:id="@+id/item_payment_tv_toWord"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:text="@string/to"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/item_payment_tv_fromDate"
+        app:layout_constraintStart_toEndOf="@+id/item_payment_tv_fromDate"
+        app:layout_constraintTop_toTopOf="@+id/item_payment_tv_fromDate" />
+
+    <TextView
+        android:id="@+id/item_payment_tv_toDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:text="30/6/2019"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/item_payment_tv_toWord"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/item_payment_tv_toWord"
+        app:layout_constraintTop_toTopOf="@+id/item_payment_tv_toWord"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/item_payment_tv_packageName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="الباقة الذهبية"
+        android:layout_marginTop="7dp"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="@+id/item_payment_tv_paidWord"
+        app:layout_constraintTop_toBottomOf="@+id/item_payment_tv_paidWord" />
+</android.support.constraint.ConstraintLayout>

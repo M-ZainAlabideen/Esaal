@@ -1,0 +1,513 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fillViewport="true"
+    android:id="@+id/fragment_registration_nestedsv_scrollContainer">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/fragment_registration_cl_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/fragment_registration_iv_profileImg"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:scaleType="centerCrop"
+                android:src="@mipmap/placeholder_profile_photo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/fragment_registration_iv_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@+id/fragment_registration_iv_profileImg"
+                app:layout_constraintTop_toTopOf="@+id/fragment_registration_iv_profileImg"
+                app:srcCompat="@mipmap/ic_add_circle" />
+
+            <TextView
+                android:id="@+id/fragment_registration_tv_addImgTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="@string/addPicture"
+                app:layout_constraintEnd_toEndOf="@+id/fragment_registration_iv_profileImg"
+                app:layout_constraintStart_toStartOf="@+id/fragment_registration_iv_profileImg"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_registration_iv_profileImg" />
+
+
+
+            <LinearLayout
+                android:id="@+id/linearLayout2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginEnd="32dp"
+                android:gravity="center"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_registration_tv_addImgTv">
+
+                <EditText
+                    android:id="@+id/fragment_registration_et_firstName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@mipmap/box_input_data"
+                    android:drawableStart="@mipmap/ic_user"
+                    android:drawablePadding="5dp"
+                    android:ems="10"
+                    android:hint="@string/firstName"
+                    android:inputType="textPersonName"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/fragment_registration_tv_addImgTv" />
+
+
+                <EditText
+                    android:id="@+id/fragment_registration_et_middleName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@mipmap/box_input_data"
+                    android:drawableStart="@mipmap/ic_user"
+                    android:drawablePadding="5dp"
+                    android:ems="10"
+                    android:hint="@string/middleName"
+                    android:inputType="textPersonName"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    app:layout_constraintEnd_toEndOf="@+id/fragment_registration_et_firstName"
+                    app:layout_constraintStart_toStartOf="@+id/fragment_registration_et_firstName"
+                    app:layout_constraintTop_toBottomOf="@+id/fragment_registration_et_firstName" />
+
+
+                <EditText
+                    android:id="@+id/fragment_registration_et_lastName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@mipmap/box_input_data"
+                    android:drawableStart="@mipmap/ic_user"
+                    android:drawablePadding="5dp"
+                    android:ems="10"
+                    android:hint="@string/lastName"
+                    android:inputType="textPersonName"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    app:layout_constraintEnd_toEndOf="@+id/fragment_registration_et_middleName"
+                    app:layout_constraintStart_toStartOf="@+id/fragment_registration_et_middleName"
+                    app:layout_constraintTop_toBottomOf="@+id/fragment_registration_et_middleName" />
+
+
+                <EditText
+                    android:id="@+id/fragment_registration_et_mobile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@mipmap/box_input_data"
+                    android:drawableStart="@mipmap/ic_phone"
+                    android:drawablePadding="5dp"
+                    android:ems="10"
+                    android:hint="@string/phone"
+                    android:inputType="phone"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:textAlignment="viewStart"
+                    app:layout_constraintEnd_toEndOf="@+id/fragment_registration_et_lastName"
+                    app:layout_constraintStart_toStartOf="@+id/fragment_registration_et_lastName"
+                    app:layout_constraintTop_toBottomOf="@+id/fragment_registration_et_lastName" />
+
+
+                <EditText
+                    android:id="@+id/fragment_registration_et_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@mipmap/box_input_data"
+                    android:drawableStart="@mipmap/ic_mail"
+                    android:drawablePadding="5dp"
+                    android:ems="10"
+                    android:hint="@string/email"
+                    android:inputType="textEmailAddress"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    app:layout_constraintEnd_toEndOf="@+id/fragment_registration_et_mobile"
+                    app:layout_constraintStart_toStartOf="@+id/fragment_registration_et_mobile"
+                    app:layout_constraintTop_toBottomOf="@+id/fragment_registration_et_mobile" />
+
+
+                <EditText
+                    android:id="@+id/fragment_registration_et_userName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@mipmap/box_input_data"
+                    android:drawableStart="@mipmap/ic_user"
+                    android:drawablePadding="5dp"
+                    android:ems="10"
+                    android:hint="@string/userName"
+                    android:inputType="textPersonName"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    app:layout_constraintEnd_toEndOf="@+id/fragment_registration_et_email"
+                    app:layout_constraintStart_toStartOf="@+id/fragment_registration_et_email"
+                    app:layout_constraintTop_toBottomOf="@+id/fragment_registration_et_email" />
+
+
+                <EditText
+                    android:id="@+id/fragment_registration_et_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@mipmap/box_input_data"
+                    android:drawableStart="@mipmap/ic_password"
+                    android:drawablePadding="5dp"
+                    android:ems="10"
+                    android:hint="@string/password"
+                    android:inputType="textPassword"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:textAlignment="viewStart"
+                    app:layout_constraintEnd_toEndOf="@+id/fragment_registration_et_userName"
+                    app:layout_constraintStart_toStartOf="@+id/fragment_registration_et_userName"
+                    app:layout_constraintTop_toBottomOf="@+id/fragment_registration_et_userName" />
+
+
+                <TextView
+                    android:id="@+id/fragment_registration_tv_country"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@mipmap/box_input_data"
+                    android:drawableStart="@mipmap/ic_address"
+                    android:drawablePadding="5dp"
+                    android:ems="10"
+                    android:gravity="center_vertical"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:text="@string/country"
+                    app:layout_constraintEnd_toEndOf="@+id/fragment_registration_et_password"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/fragment_registration_et_password" />
+
+
+                <EditText
+                    android:id="@+id/fragment_registration_et_bankName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@mipmap/box_input_data"
+                    android:drawableStart="@mipmap/ic_bank"
+                    android:drawablePadding="5dp"
+                    android:ems="10"
+                    android:hint="@string/bankName"
+                    android:inputType="text"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:textAlignment="viewStart"
+                    app:layout_constraintEnd_toEndOf="@+id/fragment_registration_tv_country"
+                    app:layout_constraintStart_toStartOf="@+id/fragment_registration_tv_country"
+                    app:layout_constraintTop_toBottomOf="@+id/fragment_registration_tv_country" />
+
+
+                <EditText
+                    android:id="@+id/fragment_registration_et_swiftCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@mipmap/box_input_data"
+                    android:drawableStart="@mipmap/ic_bank"
+                    android:drawablePadding="5dp"
+                    android:ems="10"
+                    android:hint="@string/swiftCode"
+                    android:inputType="text"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:textAlignment="viewStart"
+                    app:layout_constraintEnd_toEndOf="@+id/fragment_registration_tv_country"
+                    app:layout_constraintStart_toStartOf="@+id/fragment_registration_et_bankName"
+                    app:layout_constraintTop_toBottomOf="@+id/fragment_registration_et_bankName" />
+
+
+                <EditText
+                    android:id="@+id/fragment_registration_et_IBAN"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@mipmap/box_input_data"
+                    android:drawableStart="@mipmap/ic_bank"
+                    android:drawablePadding="5dp"
+                    android:ems="10"
+                    android:hint="@string/IBAN"
+                    android:inputType="text"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:textAlignment="viewStart"
+                    app:layout_constraintEnd_toEndOf="@+id/fragment_registration_et_swiftCode"
+                    app:layout_constraintStart_toStartOf="@+id/fragment_registration_et_swiftCode"
+                    app:layout_constraintTop_toBottomOf="@+id/fragment_registration_et_swiftCode" />
+
+
+                <EditText
+                    android:id="@+id/fragment_registration_et_accountNum"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@mipmap/box_input_data"
+                    android:drawableStart="@mipmap/ic_bank"
+                    android:drawablePadding="5dp"
+                    android:ems="10"
+                    android:hint="@string/accountNum"
+                    android:inputType="number"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:textAlignment="viewStart"
+                    app:layout_constraintEnd_toEndOf="@+id/fragment_registration_et_IBAN"
+                    app:layout_constraintStart_toStartOf="@+id/fragment_registration_et_IBAN"
+                    app:layout_constraintTop_toBottomOf="@+id/fragment_registration_et_IBAN" />
+
+
+                <EditText
+                    android:id="@+id/fragment_registration_et_personalAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@mipmap/box_input_data"
+                    android:drawableStart="@mipmap/ic_address"
+                    android:drawablePadding="5dp"
+                    android:ems="10"
+                    android:hint="@string/personalAddress"
+                    android:inputType="text"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:textAlignment="viewStart" />
+
+
+                <EditText
+                    android:id="@+id/fragment_registration_et_bankAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@mipmap/box_input_data"
+                    android:drawableStart="@mipmap/ic_bank_address"
+                    android:drawablePadding="5dp"
+                    android:ems="10"
+                    android:hint="@string/bankAddress"
+                    android:inputType="text"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:textAlignment="viewStart" />
+
+
+                <EditText
+                    android:id="@+id/fragment_registration_et_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@mipmap/box_description"
+                    android:ems="10"
+                    android:gravity="top"
+                    android:hint="@string/descriptionDots"
+                    android:inputType="textMultiLine"
+                    android:lines="5"
+                    android:padding="25dp"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:shadowColor="@color/gray"
+                    android:shadowDx="2"
+                    android:shadowDy="4" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/fragment_registration_tv_attachWord"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/attachment"
+                android:textColor="@color/grayDark"
+                app:layout_constraintStart_toStartOf="@+id/linearLayout2"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+
+            <LinearLayout
+                android:id="@+id/linearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_registration_tv_attachWord">
+
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="20dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/fragment_registration_iv_civilIdFront"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@mipmap/ic_add" />
+
+                    <TextView
+                        android:id="@+id/fragment_registration_tv_civilIdFrontTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/civilIdFront"
+                        android:textColor="@color/gray"
+                        tools:layout_editor_absoluteX="104dp"
+                        tools:layout_editor_absoluteY="594dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/fragment_registration_iv_civilIdBack"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@mipmap/ic_add" />
+
+                    <TextView
+                        android:id="@+id/fragment_registration_tv_civilIdBackTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/civilIdBack"
+                        android:textColor="@color/gray"
+                        tools:layout_editor_absoluteX="104dp"
+                        tools:layout_editor_absoluteY="594dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/fragment_registration_ll_certification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="@+id/linearLayout"
+                app:layout_constraintStart_toStartOf="@+id/linearLayout"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+                <ImageView
+                    android:id="@+id/fragment_registration_iv_certification"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:scaleType="centerCrop"
+                    app:srcCompat="@mipmap/ic_add" />
+
+                <TextView
+                    android:id="@+id/fragment_registration_tv_certificationTv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/certification"
+                    android:textColor="@color/gray"
+                    tools:layout_editor_absoluteX="269dp"
+                    tools:layout_editor_absoluteY="586dp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/fragment_registration_tv_subjectsWord"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/subjects"
+                app:layout_constraintStart_toStartOf="@+id/fragment_registration_tv_attachWord"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_registration_ll_certification" />
+
+            <!--        <com.riontech.staggeredtextgridview.StaggeredTextGridView-->
+            <!--            android:id="@+id/fragment_registration_stv_subjects"-->
+            <!--            android:layout_width="match_parent"-->
+            <!--            android:layout_height="wrap_content"-->
+            <!--            android:layout_marginTop="15dp"-->
+            <!--            app:layout_constraintEnd_toEndOf="parent"-->
+            <!--            app:layout_constraintStart_toStartOf="parent"-->
+            <!--            app:layout_constraintTop_toBottomOf="@+id/fragment_registration_tv_subjectsWord" />-->
+
+            <!--android:horizontalSpace="2dp"-->
+            <!--android:isFitToScreen="false"-->
+            <!--android:verticalSpace="2dp"-->
+
+            <com.riontech.staggeredtextgridview.StaggeredTextGridView
+                android:id="@+id/fragment_registration_stv_subjects"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_registration_tv_subjectsWord" />
+
+            <TextView
+                android:id="@+id/fragment_registration_tv_done"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@mipmap/box_btn_login"
+                android:gravity="center"
+                android:text="@string/register"
+                android:textColor="@color/white"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_registration_stv_subjects" />
+
+
+            <ProgressBar
+                android:id="@+id/loading2"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminateTint="@color/colorPrimary"
+                app:layout_constraintBottom_toBottomOf="@+id/fragment_registration_stv_subjects"
+                app:layout_constraintEnd_toEndOf="@+id/fragment_registration_stv_subjects"
+                app:layout_constraintStart_toStartOf="@+id/fragment_registration_stv_subjects"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_registration_stv_subjects" />
+
+        </android.support.constraint.ConstraintLayout>
+
+        <ProgressBar
+            android:id="@+id/loading"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:indeterminateTint="@color/colorPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</android.support.v4.widget.NestedScrollView>

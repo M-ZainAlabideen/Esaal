@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fillViewport="true">
+<android.support.constraint.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<android.support.constraint.ConstraintLayout
+    android:id="@+id/fragment_add_question_cl_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardElevation="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/fragment_add_question_rv_subjects"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:listitem="@layout/item_subject" />
+    </android.support.v7.widget.CardView>
+    <TextView
+        android:id="@+id/fragment_add_question_tv_studentName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="132dp"
+        android:padding="8dp"
+        android:text="@string/esaalStudent"
+        android:textColor="@color/grayDark"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/fragment_add_question_tv_subjectName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="علوم"
+        android:layout_marginTop="16dp"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="@+id/fragment_add_question_tv_studentName"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_add_question_tv_studentName" />
+
+
+    <EditText
+        android:id="@+id/fragment_add_question_et_questionText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginEnd="28dp"
+        android:background="@mipmap/box_add_question_or_reply"
+        android:ems="10"
+        android:gravity="top"
+        android:layout_marginTop="20dp"
+        android:hint="@string/questionText"
+        android:inputType="textMultiLine"
+        android:padding="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_add_question_tv_subjectName" />
+
+    <ImageView
+        android:id="@+id/fragment_add_question_iv_captureImg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        app:layout_constraintStart_toStartOf="@+id/fragment_add_question_et_questionText"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_add_question_et_questionText"
+        app:srcCompat="@mipmap/ic_add_gray" />
+
+    <ImageView
+        android:id="@+id/fragment_add_question_iv_captureVideo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintStart_toEndOf="@+id/fragment_add_question_iv_captureImg"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_add_question_et_questionText"
+        app:srcCompat="@mipmap/ic_add_gray" />
+
+    <TextView
+        android:id="@+id/fragment_add_question_tv_addImgWord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/addPhoto"
+        android:layout_marginTop="12dp"
+        android:textColor="@color/gray"
+        style="@style/TextAppearance.AppCompat.Small"
+        app:layout_constraintEnd_toEndOf="@+id/fragment_add_question_iv_captureImg"
+        app:layout_constraintStart_toStartOf="@+id/fragment_add_question_iv_captureImg"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_add_question_iv_captureImg" />
+
+    <TextView
+        android:id="@+id/fragment_add_question_tv_addVideoWord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/addVideo"
+        android:layout_marginTop="12dp"
+        android:textColor="@color/gray"
+        style="@style/TextAppearance.AppCompat.Small"
+        app:layout_constraintEnd_toEndOf="@+id/fragment_add_question_iv_captureVideo"
+        app:layout_constraintStart_toStartOf="@+id/fragment_add_question_iv_captureVideo"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_add_question_iv_captureVideo" />
+
+
+    <ImageView
+        android:id="@+id/fragment_add_question_iv_imgAttach"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="@+id/fragment_add_question_tv_addImgWord"
+        app:layout_constraintStart_toStartOf="@+id/fragment_add_question_tv_addImgWord"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_add_question_tv_addImgWord"
+        app:srcCompat="@mipmap/placeholder_attach" />
+
+
+    <ImageView
+        android:id="@+id/fragment_add_question_iv_videoAttach"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="@+id/fragment_add_question_tv_addVideoWord"
+        app:layout_constraintStart_toStartOf="@+id/fragment_add_question_tv_addVideoWord"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_add_question_tv_addVideoWord"
+        app:srcCompat="@mipmap/placeholder_attach" />
+
+    <ImageView
+        android:id="@+id/fragment_add_question_iv_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/fragment_add_question_iv_videoAttach"
+        app:layout_constraintEnd_toEndOf="@+id/fragment_add_question_iv_videoAttach"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/fragment_add_question_iv_videoAttach"
+        app:layout_constraintTop_toTopOf="@+id/fragment_add_question_iv_videoAttach"
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@mipmap/play" />
+
+    <!--<LinearLayout-->
+        <!--android:id="@+id/editText9"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:background="@mipmap/box_attach"-->
+        <!--android:layout_marginTop="20dp"-->
+        <!--android:padding="5dp"-->
+        <!--app:layout_constraintEnd_toEndOf="@+id/fragment_add_question_et_questionText"-->
+        <!--app:layout_constraintStart_toStartOf="@+id/fragment_add_question_et_questionText"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/fragment_add_question_tv_addImgWord">-->
+
+        <!--<android.support.v7.widget.RecyclerView-->
+            <!--android:id="@+id/fragment_add_question_rv_questionAttach"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--tools:listitem="@layout/fragment_add_question"-->
+            <!--android:orientation="horizontal"-->
+            <!--app:layoutManager="android.support.v7.widget.LinearLayoutManager"-->
+           <!--/>-->
+        <!---->
+    <!--</LinearLayout>-->
+
+    <TextView
+        android:id="@+id/fragment_add_question_tv_send"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginBottom="16dp"
+        android:background="@mipmap/box_btn_send"
+        android:gravity="center"
+        android:text="@string/send"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_add_question_iv_imgAttach"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <ImageView
+        android:id="@+id/fragment_add_question_iv_deleteImgAttach"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        app:layout_constraintStart_toStartOf="@+id/fragment_add_question_iv_imgAttach"
+        app:layout_constraintTop_toTopOf="@+id/fragment_add_question_iv_imgAttach"
+        app:srcCompat="@mipmap/ic_delete" />
+
+    <ImageView
+        android:id="@+id/fragment_add_question_iv_deleteVideoAttach"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        app:layout_constraintStart_toStartOf="@+id/fragment_add_question_iv_videoAttach"
+        app:layout_constraintTop_toTopOf="@+id/fragment_add_question_iv_videoAttach"
+        app:srcCompat="@mipmap/ic_delete" />
+</android.support.constraint.ConstraintLayout>
+    <ProgressBar
+        android:id="@+id/loading"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:indeterminateTint="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</android.support.constraint.ConstraintLayout>
+</android.support.v4.widget.NestedScrollView>

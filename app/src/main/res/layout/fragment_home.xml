@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/white"
+    android:fillViewport="true">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+    <ImageView
+        android:id="@+id/fragment_home_iv_sliderPlaceholder"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/placeholder_slider" />
+
+    <com.duolingo.open.rtlviewpager.RtlViewPager
+        android:id="@+id/fragment_home_vp_slider"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:focusableInTouchMode="true"
+        android:overScrollMode="never"
+        app:layout_constraintBottom_toBottomOf="@+id/fragment_home_iv_sliderPlaceholder"
+        app:layout_constraintEnd_toEndOf="@+id/fragment_home_iv_sliderPlaceholder"
+        app:layout_constraintStart_toStartOf="@+id/fragment_home_iv_sliderPlaceholder"
+        app:layout_constraintTop_toTopOf="@+id/fragment_home_iv_sliderPlaceholder" />
+
+
+
+
+    <me.relex.circleindicator.CircleIndicator
+        android:id="@+id/home_circleIndicator_sliderCircle"
+        android:layout_width="wrap_content"
+        android:layout_height="16dp"
+        android:layout_marginTop="20dp"
+        app:ci_drawable="@drawable/circle_selected"
+        app:ci_drawable_unselected="@drawable/circle_unselected"
+        app:layout_constraintEnd_toEndOf="@+id/fragment_home_vp_slider"
+        app:layout_constraintStart_toStartOf="@+id/fragment_home_vp_slider"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_home_vp_slider" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/fragment_home_rv_latestQuestions"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="20dp"
+        android:nestedScrollingEnabled="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_home_tv_latestQuestionsWord"
+        tools:listitem="@layout/item_question" />
+
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/fragment_home_tv_latestQuestionsWord"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/latestQuestions"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_home_iv_questionMark" />
+
+
+
+    <ImageView
+        android:visibility="gone"
+        android:id="@+id/fragment_home_iv_questionMark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/home_circleIndicator_sliderCircle"
+        app:srcCompat="@mipmap/question_mark" />
+
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/fragment_home_tv_introText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="40dp"
+        android:gravity="center"
+        android:textColor="@color/gray"
+        android:text="@string/introLabel"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_home_iv_questionMark" />
+
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/fragment_home_tv_addQuestion"
+        style="@style/TextAppearance.AppCompat.Medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@mipmap/box_btn_send"
+        android:gravity="center"
+        android:text="@string/addQuestion"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_home_tv_introText" />
+
+
+
+    <ProgressBar
+        android:id="@+id/loading"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:indeterminateTint="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="@+id/fragment_home_rv_latestQuestions"
+        app:layout_constraintStart_toStartOf="@+id/fragment_home_rv_latestQuestions"
+        app:layout_constraintTop_toTopOf="@+id/fragment_home_rv_latestQuestions" />
+
+    </android.support.constraint.ConstraintLayout>
+</android.support.v4.widget.NestedScrollView>

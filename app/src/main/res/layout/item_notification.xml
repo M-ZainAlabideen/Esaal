@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white">
+
+    <ImageView
+        android:id="@+id/item_notification_iv_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/ic_notifi_circle_gray" />
+
+    <ImageView
+        android:id="@+id/imageView11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/item_notification_iv_indicator"
+        app:layout_constraintStart_toStartOf="@+id/item_notification_iv_indicator"
+        app:layout_constraintTop_toBottomOf="@+id/item_notification_iv_indicator"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@mipmap/line_notifi" />
+
+    <TextView
+        android:id="@+id/item_notification_tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="7/7/2019"
+        android:textColor="@color/lightGray2"
+        app:layout_constraintBottom_toBottomOf="@+id/item_notification_iv_indicator"
+        app:layout_constraintStart_toEndOf="@+id/item_notification_iv_indicator"
+        app:layout_constraintTop_toTopOf="@+id/item_notification_iv_indicator" />
+
+    <TextView
+        android:id="@+id/item_notification_tv_subjectName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="علوم"
+        android:layout_marginStart="8dp"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="@+id/item_notification_v_details"
+        app:layout_constraintTop_toTopOf="@+id/imageView11" />
+
+    <TextView
+        android:id="@+id/item_notification_tv_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:lineSpacingExtra="8dp"
+        android:maxLines="2"
+        android:text="علوم تمت الاجابه على الاسئلة الخاصة بمادة العلوم للصف الثانى الاعدادى الصف الثاني الإعدادي  ..."
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView11"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/item_notification_tv_subjectName"
+        app:layout_constraintTop_toBottomOf="@+id/item_notification_tv_subjectName" />
+
+    <View
+        android:id="@+id/item_notification_v_details"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/item_notification_tv_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/imageView11"
+        app:layout_constraintTop_toTopOf="parent" />
+</android.support.constraint.ConstraintLayout>

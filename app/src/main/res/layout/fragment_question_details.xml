@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:fillViewport="true">
+<android.support.constraint.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/fragment_question_details_cl_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:background="@mipmap/box_edit_profile"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imageView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@mipmap/ic_student" />
+
+        <TextView
+            android:id="@+id/fragment_question_details_tv_studentName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/esaalStudent"
+            android:textColor="@color/colorPrimaryDark"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView5"
+            app:layout_constraintStart_toEndOf="@+id/imageView5"
+            app:layout_constraintTop_toTopOf="@+id/imageView5" />
+
+
+        <TextView
+            android:id="@+id/fragment_question_details_tv_replyText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/reply"
+            android:textColor="@color/gray"
+            app:layout_constraintBottom_toBottomOf="@+id/fragment_question_details_tv_studentName"
+            app:layout_constraintEnd_toStartOf="@+id/fragment_question_details_iv_replyImg"
+            app:layout_constraintTop_toTopOf="@+id/fragment_question_details_tv_studentName" />
+
+        <ImageView
+            android:id="@+id/fragment_question_details_iv_replyImg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:padding="5dp"
+            app:layout_constraintBottom_toBottomOf="@+id/fragment_question_details_tv_replyText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/fragment_question_details_tv_replyText"
+            app:srcCompat="@mipmap/ic_reply" />
+
+
+        <View
+            android:id="@+id/fragment_question_details_v_reply"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="@+id/fragment_question_details_iv_replyImg"
+            app:layout_constraintEnd_toEndOf="@+id/fragment_question_details_iv_replyImg"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="@+id/fragment_question_details_tv_replyText"
+            app:layout_constraintTop_toTopOf="@+id/fragment_question_details_iv_replyImg" />
+
+        <ImageView
+            android:id="@+id/fragment_question_details_iv_update"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:padding="10dp"
+            app:layout_constraintBottom_toBottomOf="@+id/fragment_question_details_tv_studentName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/fragment_question_details_tv_studentName"
+            app:srcCompat="@mipmap/ic_edit_question" />
+
+        <TextView
+            android:id="@+id/fragment_question_details_tv_subjectName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="علوم"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/black"
+            app:layout_constraintStart_toStartOf="@+id/imageView5"
+            app:layout_constraintTop_toBottomOf="@+id/imageView5" />
+
+        <ImageView
+            android:id="@+id/fragment_question_details_iv_imgAttach"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="@+id/fragment_question_details_tv_subjectName"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_question_details_tv_subjectName"
+            app:srcCompat="@mipmap/placeholder_attach" />
+
+
+        <ImageView
+            android:id="@+id/fragment_question_details_iv_videoAttach"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="12dp"
+            android:layout_marginStart="40dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toTopOf="@+id/fragment_question_details_tv_questionText"
+            app:layout_constraintStart_toEndOf="@+id/fragment_question_details_iv_imgAttach"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_question_details_tv_subjectName"
+            app:srcCompat="@mipmap/placeholder_attach" />
+
+        <ImageView
+            android:id="@+id/fragment_question_details_iv_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/fragment_question_details_iv_videoAttach"
+            app:layout_constraintEnd_toEndOf="@+id/fragment_question_details_iv_videoAttach"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/fragment_question_details_iv_videoAttach"
+            app:layout_constraintTop_toTopOf="@+id/fragment_question_details_iv_videoAttach"
+            app:layout_constraintVertical_bias="1.0"
+            app:srcCompat="@mipmap/play" />
+
+        <!--<android.support.v7.widget.RecyclerView-->
+        <!--android:id="@+id/fragment_question_details_rv_questionAttach"-->
+        <!--android:layout_width="0dp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_marginTop="16dp"-->
+        <!--android:layout_marginEnd="28dp"-->
+        <!--android:orientation="horizontal"-->
+        <!--app:layoutManager="android.support.v7.widget.LinearLayoutManager"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintStart_toStartOf="@+id/fragment_question_details_tv_subjectName"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/fragment_question_details_tv_subjectName"-->
+        <!--tools:listitem="@layout/item_attachment" />-->
+
+        <TextView
+            android:id="@+id/fragment_question_details_tv_questionText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="20dp"
+            android:paddingBottom="10dp"
+            android:text="الاهتزازات الكاملة التى يحدثها الجسم المهتز فى الثانية الواحدة"
+            android:textColor="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/fragment_question_details_iv_imgAttach"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_question_details_iv_imgAttach" />
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/fragment_question_details_cl_repliesContainer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="24dp"
+            android:background="@mipmap/box_answers"
+            android:padding="5dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_question_details_iv_triangle"
+            app:layout_constraintVertical_bias="0.0">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/fragment_question_details_rv_replies"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_reply" />
+
+        </android.support.constraint.ConstraintLayout>
+
+        <ImageView
+            android:id="@+id/fragment_question_details_iv_triangle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_question_details_tv_questionText"
+            app:srcCompat="@mipmap/triangle" />
+
+        <TextView
+            android:id="@+id/fragment_question_details_tv_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12:20 إلغاء"
+            app:layout_constraintEnd_toEndOf="@+id/fragment_question_details_v_reply"
+            app:layout_constraintTop_toBottomOf="@+id/fragment_question_details_v_reply" />
+
+
+    </android.support.constraint.ConstraintLayout>
+    <ProgressBar
+        android:id="@+id/loading"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="8dp"
+        android:indeterminateTint="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</android.support.constraint.ConstraintLayout>
+</android.support.v4.widget.NestedScrollView>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/white">
+
+    <ImageView
+        android:id="@+id/item_attachment_iv_attachImg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/placeholder_attach" />
+
+    <ImageView
+        android:id="@+id/item_attachment_iv_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/item_attachment_iv_attachImg"
+        app:layout_constraintEnd_toEndOf="@+id/item_attachment_iv_attachImg"
+        app:layout_constraintStart_toStartOf="@+id/item_attachment_iv_attachImg"
+        app:layout_constraintTop_toTopOf="@+id/item_attachment_iv_attachImg"
+        app:srcCompat="@mipmap/play" />
+</android.support.constraint.ConstraintLayout>
