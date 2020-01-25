@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:id="@+id/fragment_packages_cl_container">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/fragment_packages_rv_packages"

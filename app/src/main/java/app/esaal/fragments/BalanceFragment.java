@@ -63,11 +63,8 @@ public class BalanceFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         MainActivity.setupAppbar(true, true, false, false, "account", getString(R.string.myBalance));
         sessionManager = new SessionManager(activity);
+        GlobalFunctions.hasNewNotificationsApi(activity);
         container.setVisibility(View.GONE);
-        if(sessionManager.isBalanceRequest()){
-            withdrawBalance.setText(getString(R.string.waitingResponse));
-            withdrawBalance.setClickable(false);
-        }
         teacherBalanceApi();
     }
 
@@ -87,6 +84,12 @@ public class BalanceFragment extends Fragment {
                         loading.setVisibility(View.GONE);
                         int status = response.getStatus();
                         if (status == 200) {
+                            if (balanceResponse.isRequest) {
+                                withdrawBalance.setText(getString(R.string.waitingResponse));
+                                withdrawBalance.setClickable(false);
+                                withdrawBalance.setTextColor(getResources().getColor(R.color.colorAccent));
+                                withdrawBalance.setBackground(null);
+                            }
                             if (balanceResponse.totalAmount == 0) {
                                 balance.setText("00.00" + " " + getString(R.string.currency));
                             } else {
@@ -99,7 +102,7 @@ public class BalanceFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-
+                        GlobalFunctions.generalErrorMessage(loading, activity);
                     }
                 }
         );
@@ -107,6 +110,7 @@ public class BalanceFragment extends Fragment {
 
     private void withdrawBalanceApi() {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().withdrawBalance(
                 sessionManager.getUserToken(),
                 sessionManager.getUserId(),
@@ -114,32 +118,31 @@ public class BalanceFragment extends Fragment {
                     @Override
                     public void success(User user, Response response) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
-                                Snackbar.make(loading, getString(R.string.withdrawBalanceSuccess), Snackbar.LENGTH_SHORT).show();
-                                sessionManager.setBalanceRequest(user.isRequest);
-                                if (sessionManager.isBalanceRequest()) {
-                                    withdrawBalance.setText(getString(R.string.waitingResponse));
-                                    withdrawBalance.setClickable(false);
-                                }
-
+                            Snackbar.make(loading, getString(R.string.withdrawBalanceSuccess), Snackbar.LENGTH_SHORT).show();
+                            sessionManager.setBalanceRequest(user.isRequest);
+                            if (sessionManager.isBalanceRequest()) {
                                 withdrawBalance.setText(getString(R.string.waitingResponse));
                                 withdrawBalance.setClickable(false);
+                                withdrawBalance.setTextColor(getResources().getColor(R.color.colorAccent));
+                                withdrawBalance.setBackground(null);
                                 balance.setText("00.00" + getString(R.string.currency));
                                 questionNum.setText("0" + " " + getString(R.string.questionWord));
+                            }
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                            int failureStatus = error.getResponse().getStatus();
-                            if (failureStatus == 202) {
-                                loading.setVisibility(View.GONE);
-                                Snackbar.make(loading, getString(R.string.balanceLessThanRequired), Snackbar.LENGTH_SHORT).show();
-                            }
-                            else{
-                                GlobalFunctions.generalErrorMessage(loading,activity);
-                            }
+                        GlobalFunctions.EnableLayout(container);
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(loading, getString(R.string.balanceLessThanRequired), Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            GlobalFunctions.generalErrorMessage(loading, activity);
+                        }
                     }
                 }
         );

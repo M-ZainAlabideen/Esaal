@@ -2,10 +2,10 @@ package app.esaal.fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -17,17 +17,21 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import app.esaal.MainActivity;
 import app.esaal.R;
 import app.esaal.adapters.FilterAdapter;
 import app.esaal.adapters.QuestionsAdapter;
+import app.esaal.classes.Constants;
+import app.esaal.classes.GlobalFunctions;
 import app.esaal.classes.Navigator;
 import app.esaal.classes.RecyclerItemClickListener;
 import app.esaal.classes.SessionManager;
@@ -49,11 +53,13 @@ public class QuestionsFragment extends Fragment {
 
     private boolean isLoading = false;
     private boolean isLastPage = false;
-
+    private ArrayList<Subject> subjectsList = new ArrayList<>();
     private ArrayList<Question> questionsList = new ArrayList<>();
     private QuestionsAdapter questionsAdapter;
     private LinearLayoutManager layoutManager;
 
+    @BindView(R.id.fragment_questions_cl_container)
+    ConstraintLayout container;
     @BindView(R.id.fragment_questions_rv_questions)
     RecyclerView questions;
     @BindView(R.id.loading)
@@ -78,16 +84,17 @@ public class QuestionsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         MainActivity.setupAppbar(true, true, false, true, "account", getString(R.string.questionsAndReplies));
         sessionManager = new SessionManager(activity);
-        FilterAdapter.selectedPosition = -1;
+        GlobalFunctions.hasNewNotificationsApi(activity);
+
+        FilterAdapter.subjectsSelectedIds.clear();
         layoutManager = new LinearLayoutManager(activity);
         questionsAdapter = new QuestionsAdapter(activity, questionsList);
         questions.setLayoutManager(layoutManager);
         questions.setAdapter(questionsAdapter);
-        if (questionsList.size() > 0) {
-            loading.setVisibility(View.GONE);
-        } else {
-            questionsApi();
-        }
+        questionPageIndex = 1;
+        isLastPage = false;
+        isLoading = false;
+        questionsApi();
 
         //change the color of editText in searchView
         EditText searchEditText = (EditText) MainActivity.search.findViewById(android.support.v7.appcompat.R.id.search_src_text);
@@ -101,9 +108,9 @@ public class QuestionsFragment extends Fragment {
                 MainActivity.search.onActionViewCollapsed();
                 SearchFragment fragment = SearchFragment.newInstance(activity);
                 Bundle b = new Bundle();
-                b.putString("query",query);
+                b.putString("query", query);
                 fragment.setArguments(b);
-                Navigator.loadFragment(activity,fragment, R.id.activity_main_fl_container, true);
+                Navigator.loadFragment(activity, fragment, R.id.activity_main_fl_container, true);
                 return true;
             }
 
@@ -117,6 +124,8 @@ public class QuestionsFragment extends Fragment {
         MainActivity.filter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                isLastPage = false;
+                isLoading = false;
                 subjectsApi();
             }
         });
@@ -124,28 +133,56 @@ public class QuestionsFragment extends Fragment {
 
     public void filterPopUp(final ArrayList<Subject> subjectsList) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        View profileDialogView = ((Activity) activity).getLayoutInflater().inflate(R.layout.custom_dialog_filter, null);
-        RecyclerView filterRecycler = (RecyclerView) profileDialogView.findViewById(R.id.custom_dialog_filter_rv_filterBy);
-
+        View filterView = ((Activity) activity).getLayoutInflater().inflate(R.layout.custom_dialog_filter, null);
+        RecyclerView filterRecycler = (RecyclerView) filterView.findViewById(R.id.custom_dialog_filter_rv_filterBy);
+        TextView done = (TextView) filterView.findViewById(R.id.custom_dialog_filter_tv_done);
         filterRecycler.setLayoutManager(new GridLayoutManager(activity, 3));
-        final FilterAdapter filterAdapter = new FilterAdapter(activity, subjectsList,null);
+        final FilterAdapter filterAdapter = new FilterAdapter(activity, subjectsList, null);
         filterRecycler.setAdapter(filterAdapter);
         builder.setCancelable(true);
 
-        builder.setView(profileDialogView);
+        builder.setView(filterView);
         final AlertDialog dialog = builder.create();
         dialog.show();
         dialog.getWindow().setGravity(Gravity.CENTER);
 
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                questionsList.clear();
+                String totalSelectedSubjects = "";
+                for (Integer item : FilterAdapter.subjectsSelectedIds) {
+                    if (FilterAdapter.subjectsSelectedIds.get(0) == item) {
+                        totalSelectedSubjects = item + "";
+                    } else {
+                        totalSelectedSubjects = totalSelectedSubjects + "," + item;
+                    }
+                }
+                filterPageIndex = 1;
+                filterResultsApi(totalSelectedSubjects);
+                dialog.cancel();
+            }
+        });
         filterRecycler.addOnItemTouchListener(new RecyclerItemClickListener(activity, filterRecycler, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                FilterAdapter.selectedPosition = position;
-                filterAdapter.notifyDataSetChanged();
-                dialog.cancel();
-                loading.setVisibility(View.VISIBLE);
-                questionsList.clear();
-                filterResultsApi(subjectsList.get(FilterAdapter.selectedPosition).id);
+                if (subjectsList.get(position).id == 0) {
+                    questionsList.clear();
+                    questionPageIndex = 1;
+                    FilterAdapter.subjectsSelectedIds.clear();
+                    questionsApi();
+                    dialog.cancel();
+                } else {
+                    for (int i = 0; i < FilterAdapter.subjectsSelectedIds.size(); i++) {
+                        if (FilterAdapter.subjectsSelectedIds.get(i) == subjectsList.get(position).id) {
+                            FilterAdapter.subjectsSelectedIds.remove(i);
+                            filterAdapter.notifyDataSetChanged();
+                            return;
+                        }
+                    }
+                    FilterAdapter.subjectsSelectedIds.add(subjectsList.get(position).id);
+                    filterAdapter.notifyDataSetChanged();
+                }
             }
 
             @Override
@@ -156,8 +193,10 @@ public class QuestionsFragment extends Fragment {
 
 
     }
-    private void subjectsApi(){
+
+    private void subjectsApi() {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().userSubjects(
                 sessionManager.getUserToken(),
                 sessionManager.getUserId(),
@@ -165,22 +204,32 @@ public class QuestionsFragment extends Fragment {
                     @Override
                     public void success(ArrayList<Subject> subjects, Response response) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
-                            filterPopUp(subjects);
+                            Subject all = new Subject();
+                            all.setName(getString(R.string.all));
+                            all.id = 0;
+                            subjectsList.clear();
+                            subjectsList.add(all);
+                            subjectsList.addAll(subjects);
+                            filterPopUp(subjectsList);
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                        loading.setVisibility(View.GONE);
-                        int failureStatus = error.getResponse().getStatus();
-                        if(failureStatus == 202){
-                            Snackbar.make(loading,getString(R.string.noSubjects),Snackbar.LENGTH_SHORT).show();
+                        GlobalFunctions.EnableLayout(container);
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(loading, getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            GlobalFunctions.generalErrorMessage(loading, activity);
                         }
                     }
                 });
     }
+
     private void questionsApi() {
         EsaalApiConfig.getCallingAPIInterface().questions(
                 sessionManager.getUserToken(),
@@ -233,24 +282,27 @@ public class QuestionsFragment extends Fragment {
                                     }
                                 });
                             }
-                            } else {
-                                isLastPage = true;
-                            }
+                        } else {
+                            isLastPage = true;
+                        }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                        loading.setVisibility(View.GONE);
-                        int failureStatus = error.getResponse().getStatus();
-                        if (failureStatus == 201) {
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
+                            loading.setVisibility(View.GONE);
                             Snackbar.make(loading, getString(R.string.noQuestions), Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            GlobalFunctions.generalErrorMessage(loading, activity);
                         }
                     }
                 }
         );
     }
-    private void getMoreQuestions(){
+
+    private void getMoreQuestions() {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().questions(
                 sessionManager.getUserToken(),
                 sessionManager.getUserId(),
@@ -259,14 +311,14 @@ public class QuestionsFragment extends Fragment {
                     @Override
                     public void success(ArrayList<Question> questions, Response response) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
                             if (questions.size() > 0) {
                                 questionsList.addAll(questions);
                                 questionsAdapter.notifyDataSetChanged();
 
-                            }
-                            else{
+                            } else {
                                 isLastPage = true;
                                 questionPageIndex = questionPageIndex - 1;
                             }
@@ -278,16 +330,18 @@ public class QuestionsFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-
+                        GlobalFunctions.EnableLayout(container);
+                        GlobalFunctions.generalErrorMessage(loading, activity);
                     }
                 });
     }
-    private void filterResultsApi(final int subjectId){
+
+    private void filterResultsApi(final String subjectIds) {
         loading.setVisibility(View.VISIBLE);
         EsaalApiConfig.getCallingAPIInterface().filterResult(
                 sessionManager.getUserToken(),
                 sessionManager.getUserId(),
-                subjectId,
+                subjectIds,
                 filterPageIndex,
                 new Callback<ArrayList<Question>>() {
                     @Override
@@ -327,7 +381,7 @@ public class QuestionsFragment extends Fragment {
 
                                                     filterPageIndex = filterPageIndex + 1;
 
-                                                    getMoreFilterResults(subjectId);
+                                                    getMoreFilterResults(subjectIds);
 
                                                 }
                                             }
@@ -343,33 +397,36 @@ public class QuestionsFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         loading.setVisibility(View.GONE);
-                        int failureStatus = error.getResponse().getStatus();
-                        if (failureStatus == 201) {
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
                             Snackbar.make(loading, getString(R.string.noQuestions), Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            GlobalFunctions.generalErrorMessage(loading, activity);
                         }
                     }
                 }
         );
     }
-    private void getMoreFilterResults(int subjectId){
+
+    private void getMoreFilterResults(String subjectIds) {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().filterResult(
                 sessionManager.getUserToken(),
                 sessionManager.getUserId(),
-                subjectId,
+                subjectIds,
                 filterPageIndex,
                 new Callback<ArrayList<Question>>() {
                     @Override
                     public void success(ArrayList<Question> questions, Response response) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
                             if (questions.size() > 0) {
                                 questionsList.addAll(questions);
                                 questionsAdapter.notifyDataSetChanged();
 
-                            }
-                            else{
+                            } else {
                                 isLastPage = true;
                                 filterPageIndex = filterPageIndex - 1;
                             }
@@ -381,7 +438,8 @@ public class QuestionsFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-
+                        GlobalFunctions.EnableLayout(container);
+                        GlobalFunctions.generalErrorMessage(loading, activity);
                     }
                 }
         );

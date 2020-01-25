@@ -75,11 +75,13 @@ public class ForgetPasswordFragment extends Fragment {
 
     private void forgetPasswordApi(String email) {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().forgetPassword(email,
                 new Callback<String>() {
                     @Override
                     public void success(String s, Response response) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
                             Snackbar.make(loading,getString(R.string.checkYourMail),Snackbar.LENGTH_SHORT).show();
@@ -89,10 +91,13 @@ public class ForgetPasswordFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-                        int failureStatus = error.getResponse().getStatus();
-                        if (failureStatus == 203) {
+                        GlobalFunctions.EnableLayout(container);
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 203) {
                             loading.setVisibility(View.GONE);
                             Snackbar.make(loading,getString(R.string.notFoundEmail),Snackbar.LENGTH_SHORT).show();
+                        }
+                        else{
+                            GlobalFunctions.generalErrorMessage(loading,activity);
                         }
                     }
                 });

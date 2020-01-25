@@ -6,19 +6,48 @@ import com.google.gson.annotations.SerializedName;
 import app.esaal.MainActivity;
 
 public class AboutUsResponse {
-    @SerializedName("aboutusAr")
+    @SerializedName("aboutUsAr")
     @Expose
     private String aboutUsAr;
 
-    @SerializedName("aboutusEn")
+    @SerializedName("aboutUsEn")
     @Expose
     private String aboutUsEn;
 
-    public String getAboutUs(){
-        if(MainActivity.isEnglish)
+    @SerializedName("studentTermsConditionAr")
+    @Expose
+    private String studentTermsAr;
+
+    @SerializedName("studentTermsConditionEn")
+    @Expose
+    private String studentTermsEn;
+
+    @SerializedName("teacherTermsConditionAr")
+    @Expose
+    private String teacherTermsAr;
+
+    @SerializedName("teacherTermsConditionEn")
+    @Expose
+    private String teacherTermsEn;
+
+    public String getAboutUs() {
+        if (MainActivity.isEnglish)
             return aboutUsEn;
         else
             return aboutUsAr;
     }
 
+    public String getStudentTermsCondition() {
+        if(MainActivity.isEnglish)
+            return studentTermsEn;
+        else
+            return studentTermsAr;
+    }
+
+    public String getTeacherTermsCondition() {
+        if(MainActivity.isEnglish)
+            return teacherTermsEn;
+        else
+            return teacherTermsAr;
+    }
 }

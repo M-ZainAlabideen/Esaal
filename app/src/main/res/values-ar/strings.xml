@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ESAAL</string>
+    <string name="app_name">إسأل</string>
     <string name="userName">اسم المستخدم</string>
     <string name="password">كلمة المرور</string>
-    <string name="forgetPasswordLabel">نسيتك كلمة المرور؟</string>
+    <string name="forgetPasswordLabel">نسيت كلمة المرور؟</string>
     <string name="login">دخول</string>
     <string name="register">تسجيل</string>
     <string name="teacher">مدرس</string>
@@ -22,7 +22,6 @@
     <string name="addQuestion">اضف سؤال</string>
     <string name="questionText">ضع سؤالك هنا ...</string>
     <string name="addPhoto">إضافة صور</string>
-    <string name="addVideo">إضافة فيديو</string>
     <string name="send">إرسال</string>
     <string name="reply">رد</string>
     <string name="editProfile">تعديل الحساب</string>
@@ -117,7 +116,7 @@
     <string name="myBalance">رصيدي</string>
     <string name="balance">الرصيد:</string>
     <string name="questionsNumber">عدد الأسئلة:</string>
-    <string name="getBalance">سحب الرصيد</string>
+    <string name="requestBalance">سحب الرصيد</string>
     <string name="withdrawBalanceSuccess">تم إرسال طلبك بنجاح سوف يتم التواصل معك في أقرب وقت</string>
     <string name="balanceLessThanRequired">رصيد حسابك أقل من 3.5 دينار كويتي</string>
     <string name="waitingResponse">لقد قمت بطلب سحب رصيدك وفي إنتظار الرد عليكم</string>
@@ -149,4 +148,23 @@
     <string name="noVideo">لا يوجد فيديو لعرضه</string>
     <string name="noImage">لا يوجد صورة لعرضها</string>
     <string name="language2">ENG</string>
+    <string name="waitingForActivation">في إنتظار تفعيل الحساب الخاص بك</string>
+    <string name="notActive">لم يتم تفعيل الحساب الخاص بك بعد</string>
+    <string name="editQuestion">تعديل السؤال</string>
+    <string name="invalidPhoneNumber">رقم الهاتف الذي ادخلته غير صحيح</string>
+    <string name="login2">تسجيل الدخول</string>
+    <string name="videoDuration">مدة الفيديو يجب ألا تزيد عن 120 ثانية</string>
+    <string name="selectSubject">قم بإختيار المادة أولا</string>
+    <string name="addVideo">إضافة فيديو</string>
+    <string name="camera">الكاميرا</string>
+    <string name="gallery">الاستوديو</string>
+    <string name="continueAsGuest">الدخول كزائر</string>
+    <string name="done">تم</string>
+    <string name="terms">الشروط والأحكام</string>
+    <string name="agree">موافق علي</string>
+    <string name="agreeRequired">قم بالموافقة علي الشروط والأحكام أولا</string>
+    <string name="all">الكل</string>
+    <string name="remainsQuestions">عدد الأسئلة المتبقية من الباقة</string>
+    <string name="questions">أسئلة</string>
+    <string name="question">سؤال</string>
 </resources>

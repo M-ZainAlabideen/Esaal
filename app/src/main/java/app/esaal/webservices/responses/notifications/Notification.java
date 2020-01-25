@@ -44,6 +44,9 @@ public class Notification {
     @Expose
     private String subjectEnglishName;
 
+    @SerializedName("questionDescription")
+    @Expose
+    public String questionDescription;
 
     @SerializedName("isRead")
     @Expose

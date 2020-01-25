@@ -56,7 +56,7 @@
             android:id="@+id/activity_main_iv_filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="15dp"
+            android:padding="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/activity_main_sv_search"
             app:layout_constraintTop_toTopOf="parent"
@@ -66,10 +66,7 @@
             android:id="@+id/activity_main_iv_addQuestion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginRight="12dp"
-            android:layout_marginBottom="8dp"
-            android:padding="15dp"
+            android:padding="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toLeftOf="@+id/activity_main_iv_filter"
             app:layout_constraintTop_toTopOf="parent"
@@ -108,7 +105,6 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:layout_marginBottom="4dp"
-            android:layoutDirection="ltr"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -136,6 +132,7 @@
             </LinearLayout>
 
 
+
             <LinearLayout
                 android:id="@+id/activity_main_ll_accountContainer"
                 android:layout_width="0dp"
@@ -159,7 +156,6 @@
 
             </LinearLayout>
 
-
             <LinearLayout
                 android:id="@+id/activity_main_ll_notifiContainer"
                 android:layout_width="0dp"
@@ -169,12 +165,12 @@
                 android:gravity="center">
 
 
-                    <ImageView
-                        android:id="@+id/activity_main_iv_notification"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:padding="15dp"
-                        app:srcCompat="@mipmap/ic_notifi_unsel" />
+                <ImageView
+                    android:id="@+id/activity_main_iv_notification"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="15dp"
+                    app:srcCompat="@mipmap/ic_notifi_unsel" />
 
                 <ImageView
                     android:id="@+id/activity_main_iv_notifiDash"
@@ -183,7 +179,6 @@
                     app:srcCompat="@mipmap/dash_bottom_bar" />
 
             </LinearLayout>
-
 
             <LinearLayout
                 android:id="@+id/activity_main_ll_moreContainer"
@@ -208,8 +203,6 @@
                     app:srcCompat="@mipmap/dash_bottom_bar" />
 
             </LinearLayout>
-
-
 
         </LinearLayout>
 

@@ -3,6 +3,7 @@ package app.esaal.fragments;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import app.esaal.MainActivity;
 import app.esaal.R;
 import app.esaal.adapters.QuestionsAdapter;
+import app.esaal.classes.GlobalFunctions;
 import app.esaal.classes.SessionManager;
 import app.esaal.webservices.EsaalApiConfig;
 import app.esaal.webservices.responses.questionsAndReplies.Question;
@@ -39,11 +41,13 @@ public class SearchFragment extends Fragment {
     private QuestionsAdapter questionsAdapter;
     private LinearLayoutManager layoutManager;
 
+    @BindView(R.id.fragment_questions_cl_container)
+    ConstraintLayout container;
     @BindView(R.id.fragment_questions_rv_questions)
     RecyclerView searchResult;
     @BindView(R.id.loading)
     ProgressBar loading;
-    
+
     public static SearchFragment newInstance(FragmentActivity activity) {
         fragment = new SearchFragment();
         SearchFragment.activity = activity;
@@ -63,6 +67,8 @@ public class SearchFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         MainActivity.setupAppbar(true, true, false, false, "account", getString(R.string.searchResult));
         sessionManager = new SessionManager(activity);
+        GlobalFunctions.hasNewNotificationsApi(activity);
+
         layoutManager = new LinearLayoutManager(activity);
         questionsAdapter = new QuestionsAdapter(activity, searchResultList);
         searchResult.setLayoutManager(layoutManager);
@@ -75,7 +81,7 @@ public class SearchFragment extends Fragment {
     }
 
 
-    private void searchResultsApi(final String query){
+    private void searchResultsApi(final String query) {
         EsaalApiConfig.getCallingAPIInterface().searchResults(
                 sessionManager.getUserToken(),
                 sessionManager.getUserId(),
@@ -136,17 +142,20 @@ public class SearchFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         loading.setVisibility(View.GONE);
-                        int failureStatus = error.getResponse().getStatus();
-                        if (failureStatus == 201) {
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
                             Snackbar.make(loading, getString(R.string.noQuestions), Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            GlobalFunctions.generalErrorMessage(loading, activity);
+
                         }
                     }
                 }
         );
     }
 
-    private void getMoreResults(String query){
+    private void getMoreResults(String query) {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().searchResults(
                 sessionManager.getUserToken(),
                 sessionManager.getUserId(),
@@ -156,14 +165,15 @@ public class SearchFragment extends Fragment {
                     @Override
                     public void success(ArrayList<Question> questions, Response response) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
+
                         int status = response.getStatus();
                         if (status == 200) {
                             if (questions.size() > 0) {
                                 searchResultList.addAll(questions);
                                 questionsAdapter.notifyDataSetChanged();
 
-                            }
-                            else{
+                            } else {
                                 isLastPage = true;
                                 pageIndex = pageIndex - 1;
                             }
@@ -175,7 +185,8 @@ public class SearchFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-
+                        GlobalFunctions.EnableLayout(container);
+                        GlobalFunctions.generalErrorMessage(loading,activity);
                     }
                 });
     }

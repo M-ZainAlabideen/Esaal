@@ -54,48 +54,77 @@
         <!--app:layout_constraintTop_toBottomOf="@+id/item_reply_tv_replyText"-->
         <!--tools:listitem="@layout/item_attachment" />-->
 
-    <ImageView
-        android:id="@+id/item_reply_iv_imgAttach"
+    <LinearLayout
+        android:id="@+id/item_reply_ll_attachContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginTop="20dp"
-        android:scaleType="centerCrop"
-        app:layout_constraintStart_toStartOf="@+id/item_reply_iv_avatarImg"
-        app:layout_constraintTop_toBottomOf="@+id/item_reply_tv_replyText"
-        app:srcCompat="@mipmap/placeholder_attach" />
-
-
-    <ImageView
-        android:id="@+id/item_reply_iv_videoAttach"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="40dp"
-        android:layout_marginTop="20dp"
-        android:scaleType="centerCrop"
-        app:layout_constraintStart_toEndOf="@+id/item_reply_iv_imgAttach"
-        app:layout_constraintTop_toBottomOf="@+id/item_reply_tv_replyText"
-        app:srcCompat="@mipmap/placeholder_attach" />
-
-    <ImageView
-        android:id="@+id/item_reply_iv_play"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/item_reply_iv_videoAttach"
-        app:layout_constraintEnd_toEndOf="@+id/item_reply_iv_videoAttach"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/item_reply_iv_videoAttach"
-        app:layout_constraintTop_toTopOf="@+id/item_reply_iv_videoAttach"
-        app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@mipmap/play" />
+        app:layout_constraintStart_toStartOf="@+id/item_reply_iv_avatarImg"
+        app:layout_constraintTop_toBottomOf="@+id/item_reply_tv_replyText">
+
+        <ImageView
+            android:id="@+id/item_reply_iv_imgAttach"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"
+            android:layout_marginEnd="30dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/item_reply_tv_subjectName"
+            app:layout_constraintTop_toBottomOf="@+id/item_reply_tv_subjectName"
+            app:srcCompat="@mipmap/placeholder_attach" />
+
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/item_reply_cl_videoContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/item_reply_iv_videoAttach"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="centerCrop"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@mipmap/placeholder_attach" />
+
+
+            <ImageView
+                android:id="@+id/item_reply_iv_play"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@+id/item_reply_iv_videoAttach"
+                app:layout_constraintEnd_toEndOf="@+id/item_reply_iv_videoAttach"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/item_reply_iv_videoAttach"
+                app:layout_constraintTop_toTopOf="@+id/item_reply_iv_videoAttach"
+                app:layout_constraintVertical_bias="1.0"
+                app:srcCompat="@mipmap/play" />
+
+        </android.support.constraint.ConstraintLayout>
+
+
+
+
+    </LinearLayout>
+    
+   
     
     <View
+        android:id="@+id/item_reply_v_separatedLine"
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_marginTop="22dp"
         android:background="@color/lightGray"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/item_reply_iv_imgAttach" />
+        app:layout_constraintTop_toBottomOf="@+id/item_reply_ll_attachContainer" />
 
 
     <TextView
@@ -145,9 +174,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="15dp"
-        app:layout_constraintBottom_toBottomOf="@+id/item_reply_iv_videoAttach"
+        app:layout_constraintBottom_toBottomOf="@+id/item_reply_ll_attachContainer"
         app:layout_constraintEnd_toStartOf="@+id/item_reply_iv_dislike"
-        app:layout_constraintTop_toTopOf="@+id/item_reply_iv_videoAttach"
+        app:layout_constraintTop_toTopOf="@+id/item_reply_ll_attachContainer"
         app:srcCompat="@mipmap/ic_like_unsel" />
 
 

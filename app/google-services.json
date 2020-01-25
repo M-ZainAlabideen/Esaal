@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "232996380595",
+    "firebase_url": "https://esaal-47a3a.firebaseio.com",
+    "project_id": "esaal-47a3a",
+    "storage_bucket": "esaal-47a3a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:232996380595:android:86883870ca418ec1a3f5c6",
+        "android_client_info": {
+          "package_name": "app.esaal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "232996380595-d94r60dauiq4m0ddarmqvcku6cevq1im.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB8v5LhTRRdKqTsHAAlYooQAztEv1TrlLI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "232996380595-d94r60dauiq4m0ddarmqvcku6cevq1im.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

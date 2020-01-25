@@ -1,18 +1,27 @@
 package app.esaal.fragments;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -20,21 +29,23 @@ import android.widget.TextView;
 import com.duolingo.open.rtlviewpager.RtlViewPager;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import app.esaal.MainActivity;
 import app.esaal.R;
+import app.esaal.adapters.FilterAdapter;
 import app.esaal.adapters.QuestionsAdapter;
 import app.esaal.adapters.SliderAdapter;
 import app.esaal.classes.FixControl;
+import app.esaal.classes.GlobalFunctions;
 import app.esaal.classes.Navigator;
+import app.esaal.classes.RecyclerItemClickListener;
 import app.esaal.classes.SessionManager;
 import app.esaal.webservices.EsaalApiConfig;
-import app.esaal.webservices.responses.notifications.Notification;
 import app.esaal.webservices.responses.questionsAndReplies.Question;
 import app.esaal.webservices.responses.slider.Slider;
+import app.esaal.webservices.responses.subjects.Subject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -51,11 +62,18 @@ public class HomeFragment extends Fragment {
     private SliderAdapter sliderAdapter;
     private int currentPage = 0;
     private int NUM_PAGES = 0;
-
+    private ArrayList<Subject> subjectList = new ArrayList<>();
     private ArrayList<Question> questionsList = new ArrayList<>();
     private QuestionsAdapter questionsAdapter;
     LinearLayoutManager layoutManager;
 
+    private int questionPageIndex = 1;
+    private int filterPageIndex = 1;
+    private boolean isLoading = false;
+    private boolean isLastPage = false;
+
+    @BindView(R.id.fragment_home_cl_container)
+    ConstraintLayout container;
     @BindView(R.id.fragment_home_iv_sliderPlaceholder)
     ImageView sliderPlaceholder;
     @BindView(R.id.fragment_home_vp_slider)
@@ -64,8 +82,8 @@ public class HomeFragment extends Fragment {
     CircleIndicator sliderCircles;
     @BindView(R.id.fragment_home_tv_latestQuestionsWord)
     TextView latestQuestionsWord;
-    @BindView(R.id.fragment_home_rv_latestQuestions)
-    RecyclerView latestQuestions;
+    @BindView(R.id.fragment_home_rv_questions)
+    RecyclerView questions;
     @BindView(R.id.fragment_home_iv_questionMark)
     ImageView questionMark;
     @BindView(R.id.fragment_home_tv_introText)
@@ -93,14 +111,25 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        MainActivity.setupAppbar(true, true, true, false, "home", getString(R.string.ask));
         sessionManager = new SessionManager(activity);
+        boolean isQuestion = false;
+        if (sessionManager.isGuest()) {
+            isQuestion = false;
+            sessionManager.setTeacher(false);
+        } else {
+            isQuestion = true;
+        }
+        MainActivity.setupAppbar(true, true, true, isQuestion, "home", getString(R.string.ask));
+        loading.setVisibility(View.GONE);
+        GlobalFunctions.hasNewNotificationsApi(activity);
+        FilterAdapter.subjectsSelectedIds.clear();
         if (sessionManager.isTeacher()) {
             MainActivity.addQuestion.setVisibility(View.GONE);
-            addQuestion.setVisibility(View.GONE);
+        } else {
+            MainActivity.addQuestion.setVisibility(View.VISIBLE);
         }
         int Height = FixControl.getImageHeight(activity, R.mipmap.placeholder_slider);
-        sliderPlaceholder.getLayoutParams().height = Height;
+        slider.getLayoutParams().height = Height;
 
         if (sliderList.size() <= 0) {
             sliderApi();
@@ -132,11 +161,18 @@ public class HomeFragment extends Fragment {
 
         layoutManager = new LinearLayoutManager(activity);
         questionsAdapter = new QuestionsAdapter(activity, questionsList);
-        latestQuestions.setLayoutManager(layoutManager);
-        latestQuestions.setAdapter(questionsAdapter);
+        questions.setLayoutManager(layoutManager);
+        questions.setAdapter(questionsAdapter);
 
-        questionsApi();
 
+        if (sessionManager.isLoggedIn()) {
+            questionPageIndex = 1;
+            isLastPage= false;
+            isLoading = false;
+            questionsApi();
+        } else {
+            setupViews(false);
+        }
 
         if (MainActivity.isEnglish) {
             Typeface enBold = Typeface.createFromAsset(activity.getAssets(), "montserrat_medium.ttf");
@@ -147,24 +183,276 @@ public class HomeFragment extends Fragment {
             introText.setTypeface(arBold);
             introText.setTypeface(arBold);
         }
+
+        //change the color of editText in searchView
+        EditText searchEditText = (EditText) MainActivity.search.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        searchEditText.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+        searchEditText.setHintTextColor(getResources().getColor(R.color.colorPrimaryDark));
+
+        MainActivity.search.setMaxWidth(Integer.MAX_VALUE);
+        MainActivity.search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                MainActivity.search.onActionViewCollapsed();
+                SearchFragment fragment = SearchFragment.newInstance(activity);
+                Bundle b = new Bundle();
+                b.putString("query", query);
+                fragment.setArguments(b);
+                Navigator.loadFragment(activity, fragment, R.id.activity_main_fl_container, true);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                return false;
+            }
+        });
+
+        MainActivity.filter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                isLastPage = false;
+                isLoading = false;
+                subjectsApi();
+            }
+        });
+    }
+
+    public void filterPopUp(final ArrayList<Subject> subjectsList) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        View filterView = ((Activity) activity).getLayoutInflater().inflate(R.layout.custom_dialog_filter, null);
+        RecyclerView filterRecycler = (RecyclerView) filterView.findViewById(R.id.custom_dialog_filter_rv_filterBy);
+        TextView done = (TextView) filterView.findViewById(R.id.custom_dialog_filter_tv_done);
+        filterRecycler.setLayoutManager(new GridLayoutManager(activity, 3));
+        final FilterAdapter filterAdapter = new FilterAdapter(activity, subjectsList, null);
+        filterRecycler.setAdapter(filterAdapter);
+        builder.setCancelable(true);
+
+        builder.setView(filterView);
+        final AlertDialog dialog = builder.create();
+        dialog.show();
+        dialog.getWindow().setGravity(Gravity.CENTER);
+
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                questionsList.clear();
+                String totalSelectedSubjects = "";
+                for (Integer item : FilterAdapter.subjectsSelectedIds) {
+                    if (FilterAdapter.subjectsSelectedIds.get(0) == item) {
+                        totalSelectedSubjects = item + "";
+                    } else {
+                        totalSelectedSubjects = totalSelectedSubjects + "," + item;
+                    }
+                }
+                filterPageIndex = 1;
+                dialog.cancel();
+                filterResultsApi(totalSelectedSubjects);
+            }
+        });
+        filterRecycler.addOnItemTouchListener(new RecyclerItemClickListener(activity, filterRecycler, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                if (subjectsList.get(position).id == 0) {
+                    questionPageIndex = 1;
+                    questionsList.clear();
+                    FilterAdapter.subjectsSelectedIds.clear();
+                    questionsApi();
+                    dialog.cancel();
+                } else {
+                    for (int i = 0; i < FilterAdapter.subjectsSelectedIds.size(); i++) {
+                        if (FilterAdapter.subjectsSelectedIds.get(i) == subjectsList.get(position).id) {
+                            FilterAdapter.subjectsSelectedIds.remove(i);
+                            filterAdapter.notifyDataSetChanged();
+                            return;
+                        }
+                    }
+                    FilterAdapter.subjectsSelectedIds.add(subjectsList.get(position).id);
+                    filterAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onItemLongClick(View view, int position) {
+
+            }
+        }));
+
+
+    }
+
+    private void subjectsApi() {
+        loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
+        EsaalApiConfig.getCallingAPIInterface().userSubjects(
+                sessionManager.getUserToken(),
+                sessionManager.getUserId(),
+                new Callback<ArrayList<Subject>>() {
+                    @Override
+                    public void success(ArrayList<Subject> subjects, Response response) {
+                        loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
+                        int status = response.getStatus();
+                        if (status == 200) {
+                            Subject all = new Subject();
+                            all.setName(getString(R.string.all));
+                            all.id = 0;
+                            subjectList.clear();
+                            subjectList.add(all);
+                            subjectList.addAll(subjects);
+                            filterPopUp(subjectList);
+                        }
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        GlobalFunctions.EnableLayout(container);
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(loading, getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            GlobalFunctions.generalErrorMessage(loading, activity);
+                        }
+                    }
+                });
+    }
+
+    private void filterResultsApi(final String subjectIds) {
+        loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
+        EsaalApiConfig.getCallingAPIInterface().filterResult(
+                sessionManager.getUserToken(),
+                sessionManager.getUserId(),
+                subjectIds,
+                filterPageIndex,
+                new Callback<ArrayList<Question>>() {
+                    @Override
+                    public void success(ArrayList<Question> questions, Response response) {
+                        loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
+                        int status = response.getStatus();
+                        if (status == 200) {
+                            if (questions.size() > 0) {
+                                questionsList.addAll(questions);
+                                questionsAdapter.notifyDataSetChanged();
+                                //add Scroll listener to the recycler , for pagination
+                                fragment.questions.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                                    @Override
+                                    public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                                        super.onScrollStateChanged(recyclerView, newState);
+                                    }
+
+                                    @Override
+                                    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                                        super.onScrolled(recyclerView, dx, dy);
+                                        if (!isLastPage) {
+                                            int visibleItemCount = layoutManager.getChildCount();
+
+                                            int totalItemCount = layoutManager.getItemCount();
+
+                                            int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
+
+                                /*isLoading variable used for check if the user send many requests
+                                for pagination(make many scrolls in the same time)
+                                1- if isLoading true >> there is request already sent so,
+                                no more requests till the response of last request coming
+                                2- else >> send new request for load more data (News)*/
+                                            if (!isLoading) {
+
+                                                if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                                                    isLoading = true;
+
+                                                    filterPageIndex = filterPageIndex + 1;
+
+                                                    getMoreFilterResults(subjectIds);
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        } else {
+                            isLastPage = true;
+                        }
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
+
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
+                            Snackbar.make(loading, getString(R.string.noQuestions), Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            GlobalFunctions.generalErrorMessage(loading, activity);
+                        }
+                    }
+                }
+        );
+    }
+
+    private void getMoreFilterResults(String subjectIds) {
+        loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
+
+        EsaalApiConfig.getCallingAPIInterface().filterResult(
+                sessionManager.getUserToken(),
+                sessionManager.getUserId(),
+                subjectIds,
+                filterPageIndex,
+                new Callback<ArrayList<Question>>() {
+                    @Override
+                    public void success(ArrayList<Question> questions, Response response) {
+                        loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
+
+                        int status = response.getStatus();
+                        if (status == 200) {
+                            if (questions.size() > 0) {
+                                questionsList.addAll(questions);
+                                questionsAdapter.notifyDataSetChanged();
+
+                            } else {
+                                isLastPage = true;
+                                filterPageIndex = filterPageIndex - 1;
+                            }
+                            isLoading = false;
+
+
+                        }
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        GlobalFunctions.EnableLayout(container);
+                        GlobalFunctions.generalErrorMessage(loading, activity);
+                    }
+                }
+        );
     }
 
     @OnClick(R.id.fragment_home_tv_addQuestion)
     public void addQuestionClick() {
-        Navigator.loadFragment(activity, AddQuestionFragment.newInstance(activity, "add", null), R.id.activity_main_fl_container, true);
+        if (sessionManager.getUserId() == 0) {
+            Navigator.loadFragment(activity, LoginFragment.newInstance(activity), R.id.activity_main_fl_container, false);
+        } else {
+            Navigator.loadFragment(activity, AddQuestionFragment.newInstance(activity, "add", null), R.id.activity_main_fl_container, true);
+        }
     }
 
     private void setupViews(boolean hasQuestions) {
         if (hasQuestions) {
             latestQuestionsWord.setVisibility(View.VISIBLE);
-            latestQuestions.setVisibility(View.VISIBLE);
+            questions.setVisibility(View.VISIBLE);
 
             questionMark.setVisibility(View.GONE);
             introText.setVisibility(View.GONE);
             addQuestion.setVisibility(View.GONE);
         } else {
             latestQuestionsWord.setVisibility(View.GONE);
-            latestQuestions.setVisibility(View.GONE);
+            questions.setVisibility(View.GONE);
 
             questionMark.setVisibility(View.VISIBLE);
             if (!sessionManager.isTeacher()) {
@@ -200,7 +488,6 @@ public class HomeFragment extends Fragment {
 
     private void sliderApi() {
         EsaalApiConfig.getCallingAPIInterface().slider(
-                sessionManager.getUserToken(),
                 new Callback<ArrayList<Slider>>() {
                     @Override
                     public void success(ArrayList<Slider> sliders, Response response) {
@@ -213,20 +500,24 @@ public class HomeFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-
+                        GlobalFunctions.generalErrorMessage(loading, activity);
                     }
                 });
     }
 
     private void questionsApi() {
+        GlobalFunctions.DisableLayout(container);
+
         EsaalApiConfig.getCallingAPIInterface().questions(
                 sessionManager.getUserToken(),
                 sessionManager.getUserId(),
-                0,
+                questionPageIndex,
                 new Callback<ArrayList<Question>>() {
                     @Override
                     public void success(ArrayList<Question> questions, Response response) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
+
                         int status = response.getStatus();
                         if (status == 200) {
                             latestQuestionsWord.setVisibility(View.VISIBLE);
@@ -242,8 +533,46 @@ public class HomeFragment extends Fragment {
                                         questionsList.add(value);
                                     }
                                 }
+                                questionsAdapter.notifyDataSetChanged();
+                                //add Scroll listener to the recycler , for pagination
+                                fragment.questions.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                                    @Override
+                                    public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                                        super.onScrollStateChanged(recyclerView, newState);
+                                    }
+
+                                    @Override
+                                    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                                        super.onScrolled(recyclerView, dx, dy);
+                                        if (!isLastPage) {
+                                            int visibleItemCount = layoutManager.getChildCount();
+
+                                            int totalItemCount = layoutManager.getItemCount();
+
+                                            int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
+
+                                /*isLoading variable used for check if the user send many requests
+                                for pagination(make many scrolls in the same time)
+                                1- if isLoading true >> there is request already sent so,
+                                no more requests till the response of last request coming
+                                2- else >> send new request for load more data (News)*/
+                                            if (!isLoading) {
+
+                                                if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                                                    isLoading = true;
+
+                                                    questionPageIndex = questionPageIndex + 1;
+
+                                                    getMoreQuestions();
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                });
+                            } else {
+                                isLastPage = true;
                             }
-                            questionsAdapter.notifyDataSetChanged();
                             setupViews(true);
                         }
                     }
@@ -251,14 +580,52 @@ public class HomeFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         loading.setVisibility(View.GONE);
-                        int failureStatus = error.getResponse().getStatus();
-                        if (failureStatus == 201) {
+                        GlobalFunctions.EnableLayout(container);
+
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
                             setupViews(false);
+                        } else {
+                            GlobalFunctions.generalErrorMessage(loading, activity);
                         }
                     }
                 }
         );
     }
 
+    private void getMoreQuestions() {
+        loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
+        EsaalApiConfig.getCallingAPIInterface().questions(
+                sessionManager.getUserToken(),
+                sessionManager.getUserId(),
+                questionPageIndex,
+                new Callback<ArrayList<Question>>() {
+                    @Override
+                    public void success(ArrayList<Question> questions, Response response) {
+                        loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
+                        int status = response.getStatus();
+                        if (status == 200) {
+                            if (questions.size() > 0) {
+                                questionsList.addAll(questions);
+                                questionsAdapter.notifyDataSetChanged();
+
+                            } else {
+                                isLastPage = true;
+                                questionPageIndex = questionPageIndex - 1;
+                            }
+                            isLoading = false;
+
+
+                        }
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        GlobalFunctions.EnableLayout(container);
+                        GlobalFunctions.generalErrorMessage(loading, activity);
+                    }
+                });
+    }
 }
 

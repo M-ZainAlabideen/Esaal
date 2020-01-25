@@ -17,6 +17,10 @@ public class Navigator {
                     .replace(containerId, baseFragment).addToBackStack("").commit();
     }
 
+    public static void loadFragmentPackages(FragmentActivity activity, Fragment baseFragment, int containerId, String Tag) {
+            activity.getSupportFragmentManager().beginTransaction()
+                    .replace(containerId, baseFragment, Tag).addToBackStack(Tag).commit();
+    }
 /*
 *
 Context simple explaining :

@@ -5,12 +5,17 @@ import com.google.gson.annotations.SerializedName;
 
 public class Balance {
 
+    @SerializedName("isRequest")
+    @Expose
+    public boolean isRequest;
+
     @SerializedName("totalAmount")
     @Expose
-    public int totalAmount;
+    public double totalAmount;
 
     @SerializedName("totalQuestionAnswer")
     @Expose
     public int totalQuestions;
 
 }
+

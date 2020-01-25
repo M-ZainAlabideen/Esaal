@@ -12,7 +12,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -135,6 +134,8 @@ public class EditProfileFragment extends Fragment {
         MainActivity.setupAppbar(true, true, false, false, "account", getString(R.string.editProfile));
         FixControl.setupUI(container, activity);
         sessionManager = new SessionManager(activity);
+        GlobalFunctions.hasNewNotificationsApi(activity);
+
         container.setVisibility(View.GONE);
 
         countryWord.setVisibility(View.GONE);
@@ -167,11 +168,11 @@ public class EditProfileFragment extends Fragment {
             subjectsAdapter = new StaggeredSubjectsAdapter(activity, subjectsList, subjectsIds, true);
             subjects.setAdapter(subjectsAdapter);
         }
-            if (userData == null) {
-                userByIdApi();
-            } else {
-                setData();
-            }
+        if (userData == null) {
+            userByIdApi();
+        } else {
+            setData();
+        }
     }
 
     @OnClick(R.id.fragment_edit_profile_et_country)
@@ -377,6 +378,7 @@ public class EditProfileFragment extends Fragment {
 
     private void userByIdApi() {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().userById(
                 sessionManager.getUserToken(),
                 sessionManager.getUserId(),
@@ -384,6 +386,7 @@ public class EditProfileFragment extends Fragment {
                     @Override
                     public void success(User user, Response response) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
                             if (user != null) {
@@ -395,7 +398,8 @@ public class EditProfileFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-
+                        GlobalFunctions.EnableLayout(container);
+                        GlobalFunctions.generalErrorMessage(loading, activity);
                     }
                 }
         );
@@ -403,6 +407,7 @@ public class EditProfileFragment extends Fragment {
 
     private void editStudentProfileApi(StudentRequest student) {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().editStudentProfile(
                 sessionManager.getUserToken(),
                 student,
@@ -410,6 +415,7 @@ public class EditProfileFragment extends Fragment {
                     @Override
                     public void success(User user, Response response) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
                             Snackbar.make(loading, getString(R.string.profileUpdatedSuccessfully), Snackbar.LENGTH_SHORT).show();
@@ -420,12 +426,12 @@ public class EditProfileFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         loading.setVisibility(View.GONE);
-                        int failureStatus = error.getResponse().getStatus();
-                        if (failureStatus == 201) {
+                        GlobalFunctions.EnableLayout(container);
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
                             Snackbar.make(loading, getString(R.string.emailExists), Snackbar.LENGTH_SHORT).show();
-                        } else if (failureStatus == 202) {
+                        } else if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
                             Snackbar.make(loading, getString(R.string.userNameExists), Snackbar.LENGTH_SHORT).show();
-                        } else if (failureStatus == 203) {
+                        } else if (error.getResponse() != null && error.getResponse().getStatus() == 203) {
                             Snackbar.make(loading, getString(R.string.mobileExists), Snackbar.LENGTH_SHORT).show();
                         } else {
                             GlobalFunctions.generalErrorMessage(loading, activity);
@@ -437,6 +443,7 @@ public class EditProfileFragment extends Fragment {
 
     private void editTeacherProfileApi(TeacherRequest teacherRequest) {
         loading2.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().editTeacherProfile(
                 sessionManager.getUserToken(),
                 teacherRequest,
@@ -444,6 +451,7 @@ public class EditProfileFragment extends Fragment {
                     @Override
                     public void success(User user, Response response) {
                         loading2.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
                             Snackbar.make(loading, getString(R.string.profileUpdatedSuccessfully), Snackbar.LENGTH_SHORT).show();
@@ -454,12 +462,12 @@ public class EditProfileFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         loading2.setVisibility(View.GONE);
-                        int failureStatus = error.getResponse().getStatus();
-                        if (failureStatus == 201) {
+                        GlobalFunctions.EnableLayout(container);
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
                             Snackbar.make(loading, getString(R.string.emailExists), Snackbar.LENGTH_SHORT).show();
-                        } else if (failureStatus == 202) {
+                        } else if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
                             Snackbar.make(loading, getString(R.string.userNameExists), Snackbar.LENGTH_SHORT).show();
-                        } else if (failureStatus == 203) {
+                        } else if (error.getResponse() != null && error.getResponse().getStatus() == 203) {
                             Snackbar.make(loading, getString(R.string.mobileExists), Snackbar.LENGTH_SHORT).show();
                         } else {
                             GlobalFunctions.generalErrorMessage(loading2, activity);
@@ -483,8 +491,7 @@ public class EditProfileFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-                        int failureStatus = error.getResponse().getStatus();
-                        if (failureStatus == 202) {
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
                             Snackbar.make(loading, getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
                         } else {
                             GlobalFunctions.generalErrorMessage(loading, activity);
@@ -515,8 +522,7 @@ public class EditProfileFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-                        int failureStatus = error.getResponse().getStatus();
-                        if (failureStatus == 202) {
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
                             Snackbar.make(loading, getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
                         } else {
                             GlobalFunctions.generalErrorMessage(loading, activity);
@@ -540,7 +546,7 @@ public class EditProfileFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-
+                        GlobalFunctions.generalErrorMessage(loading, activity);
                     }
                 }
         );

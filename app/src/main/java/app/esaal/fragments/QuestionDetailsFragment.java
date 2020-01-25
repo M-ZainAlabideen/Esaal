@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import app.esaal.MainActivity;
 import app.esaal.R;
 import app.esaal.adapters.RepliesAdapter;
+import app.esaal.classes.FixControl;
 import app.esaal.classes.GlobalFunctions;
 import app.esaal.classes.Navigator;
 import app.esaal.classes.SessionManager;
@@ -87,6 +88,8 @@ public class QuestionDetailsFragment extends Fragment {
     TextView questionText;
     @BindView(R.id.fragment_question_details_iv_imgAttach)
     ImageView imgAttach;
+    @BindView(R.id.fragment_question_details_cl_videoContainer)
+    ConstraintLayout videoContainer;
     @BindView(R.id.fragment_question_details_iv_videoAttach)
     ImageView videoAttach;
     @BindView(R.id.fragment_question_details_iv_play)
@@ -120,6 +123,8 @@ public class QuestionDetailsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         MainActivity.setupAppbar(true, true, false, false, "account", getString(R.string.questionsAndReplies));
         sessionManager = new SessionManager(activity);
+        GlobalFunctions.hasNewNotificationsApi(activity);
+
         container.setVisibility(View.GONE);
         questionByIdApi(getArguments().getInt("questionId"));
 
@@ -139,7 +144,7 @@ public class QuestionDetailsFragment extends Fragment {
         if (videoUrl == null || videoUrl.isEmpty()) {
             Snackbar.make(loading, getString(R.string.noVideo), Snackbar.LENGTH_SHORT).show();
         } else {
-            Navigator.loadFragment(activity, VideoPlayerFragment.newInstance(activity, videoUrl), R.id.activity_main_fl_container, true);
+            Navigator.loadFragment(activity, UrlsFragment.newInstance(activity, videoUrl,"video"), R.id.activity_main_fl_container, true);
         }
     }
 
@@ -176,6 +181,8 @@ public class QuestionDetailsFragment extends Fragment {
     }
 
     private void setData() {
+        imageUrl = null;
+        videoUrl = null;
         if (sessionManager.isTeacher()) {
             update.setVisibility(View.GONE);
             if (question.replies == null || question.replies.size() == 0) {
@@ -210,10 +217,17 @@ public class QuestionDetailsFragment extends Fragment {
                     loadImages(value.fileUrl, imgAttach);
                     imageUrl = value.fileUrl;
                 } else if (value.fileType.equals("v")) {
-                    loadImages(value.fileUrl, videoAttach);
                     videoUrl = value.fileUrl;
+                    loadImages(value.videoFrameUrl,videoAttach);
                 }
             }
+        }
+
+        if(imageUrl == null || imageUrl.isEmpty()){
+            imgAttach.setVisibility(View.GONE);
+        }
+        if(videoUrl == null || videoUrl.isEmpty()){
+            videoContainer.setVisibility(View.GONE);
         }
 
         if (question.replies != null && question.replies.size() > 0) {
@@ -251,7 +265,7 @@ public class QuestionDetailsFragment extends Fragment {
                     if (videoUrl == null || videoUrl.isEmpty()) {
                         Snackbar.make(loading, getString(R.string.noVideo), Snackbar.LENGTH_SHORT).show();
                     } else {
-                        Navigator.loadFragment(activity, VideoPlayerFragment.newInstance(activity, videoUrl), R.id.activity_main_fl_container, true);
+                        Navigator.loadFragment(activity, UrlsFragment.newInstance(activity, videoUrl,"video"), R.id.activity_main_fl_container, true);
                     }
                 }
             });
@@ -265,12 +279,20 @@ public class QuestionDetailsFragment extends Fragment {
     }
 
     private void loadImages(String url, ImageView image) {
+        int Width = FixControl.getImageWidth(activity, R.mipmap.placeholder_attach);
+        int Height = FixControl.getImageHeight(activity, R.mipmap.placeholder_attach);
+        image.getLayoutParams().height = Height;
+        image.getLayoutParams().width = Width;
+        //the next 2 lines used in case of videos
+        play.getLayoutParams().height = Height;
+        play.getLayoutParams().width = Width;
         Glide.with(activity)
                 .load(url)
                 .apply(new RequestOptions().placeholder(R.mipmap.placeholder_attach)
                         .error(R.mipmap.placeholder_attach))
                 .into(image);
     }
+
 
     private void questionByIdApi(final int questionId) {
         EsaalApiConfig.getCallingAPIInterface().questionById(
@@ -298,11 +320,13 @@ public class QuestionDetailsFragment extends Fragment {
 
     private void likeApi(int replyId, final ImageView likeImg, final ImageView dislikeImg, final ProgressBar loading) {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().like(sessionManager.getUserToken(),
                 replyId, new Callback<Response>() {
                     @Override
                     public void success(Response response, Response response2) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         int status = response2.getStatus();
                         if (status == 200) {
                             if (likeImg.getDrawable().getConstantState() == getResources().getDrawable(R.mipmap.ic_like_sel).getConstantState()) {
@@ -316,7 +340,8 @@ public class QuestionDetailsFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-
+                        GlobalFunctions.EnableLayout(container);
+                        GlobalFunctions.generalErrorMessage(loading,activity);
                     }
                 }
         );
@@ -324,6 +349,7 @@ public class QuestionDetailsFragment extends Fragment {
 
     private void dislikeApi(int replyId, final ImageView likeImg, final ImageView dislikeImg, final ProgressBar loading) {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().dislike(
                 sessionManager.getUserToken(),
                 replyId,
@@ -331,6 +357,7 @@ public class QuestionDetailsFragment extends Fragment {
                     @Override
                     public void success(Response response, Response response2) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         int status = response2.getStatus();
                         if (status == 200) {
                             if (dislikeImg.getDrawable().getConstantState() == getResources().getDrawable(R.mipmap.ic_dislike_sel).getConstantState()) {
@@ -344,7 +371,8 @@ public class QuestionDetailsFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-
+                        GlobalFunctions.EnableLayout(container);
+                        GlobalFunctions.generalErrorMessage(loading,activity);
                     }
                 }
         );
@@ -370,6 +398,7 @@ public class QuestionDetailsFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
+                        GlobalFunctions.generalErrorMessage(loading,activity);
                     }
                 }
         );
@@ -391,7 +420,7 @@ public class QuestionDetailsFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-
+                        GlobalFunctions.generalErrorMessage(loading,activity);
                     }
                 }
         );

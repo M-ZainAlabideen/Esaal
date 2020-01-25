@@ -12,17 +12,34 @@ public class SessionManager {
     public static SharedPreferences.Editor editor;
     public static final String USER_PREF = "user_pref";
     private static final String IS_LOGGED = "is_logged";
+    private static final String IS_GUEST = "isGuest";
     private static final String ACCOUNT_TYPE = "account_type";
     private static final String USER_TOKEN = "token";
     private static final String USER_ID = "user_id";
     private static final String LANGUAGE_CODE = "language_code";
     private static final String HAS_PACKAGE = "has_package";
-    public static final String BALANCE_REQUEST = "balance_request";
+    private static final String BALANCE_REQUEST = "balance_request";
+    private static String IS_NOTIFICATION_ON = "is_Notification_on";
+    private static final String REG_ID = "reg_id";
 
     public SessionManager(Context context) {
         this.context = context;
         sharedPref = context.getSharedPreferences(USER_PREF, MODE_PRIVATE);
         editor = sharedPref.edit();
+    }
+
+    public void guestSession() {
+        editor.putBoolean(IS_GUEST, true);
+        editor.commit();
+    }
+
+    public boolean isGuest() {
+        return sharedPref.getBoolean(IS_GUEST, false);
+    }
+
+    public void guestLogout() {
+        editor.putBoolean(IS_GUEST, false);
+        editor.commit();
     }
 
     public void LoginSession() {
@@ -36,11 +53,13 @@ public class SessionManager {
 
     public void logout() {
         editor.putBoolean(IS_LOGGED, false);
-        editor.commit();
         setUserToken(null);
         setTeacher(false);
        setPackage(false);
         setUserId(0);
+        setRegId(null);
+        setBalanceRequest(false);
+        editor.commit();
     }
 
     public void setTeacher(boolean isTeacher) {
@@ -100,4 +119,22 @@ public class SessionManager {
     public boolean isBalanceRequest() {
         return sharedPref.getBoolean(BALANCE_REQUEST, false);
     }
+
+    public void setNotification(boolean status){
+        editor.putBoolean(IS_NOTIFICATION_ON,status);
+        editor.commit();
+    }
+    public boolean isNotificationOn(){
+        return  sharedPref.getBoolean(IS_NOTIFICATION_ON,true);
+    }
+
+    public String getRegId() {
+        return sharedPref.getString(REG_ID, "");
+    }
+
+    public void setRegId(String id) {
+        editor.putString(REG_ID, id);
+        editor.commit();
+    }
+
 }

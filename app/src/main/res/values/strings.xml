@@ -2,7 +2,7 @@
     <string name="app_name">ESAAL</string>
     <string name="userName">User Name</string>
     <string name="password">Password</string>
-    <string name="forgetPasswordLabel">ForgetPassword?</string>
+    <string name="forgetPasswordLabel">Forget Password ?</string>
     <string name="login">Login</string>
     <string name="register">Register</string>
     <string name="teacher">Teacher</string>
@@ -21,7 +21,6 @@ Get answers to all questions in all subjects for different levels of education,
     <string name="addQuestion">Add Question</string>
     <string name="questionText">Your Question Here...</string>
     <string name="addPhoto">Add Photo</string>
-    <string name="addVideo">Add Video</string>
     <string name="send">Send</string>
     <string name="reply">Reply</string>
     <string name="editProfile">Edit Profile</string>
@@ -58,7 +57,7 @@ Get answers to all questions in all subjects for different levels of education,
     <string name="middleName">Middle Name</string>
     <string name="firstName">First Name</string>
     <string name="enterLastName">Enter Last Name</string>
-    <string name="enterFirstName">Enter Last Name</string>
+    <string name="enterFirstName">Enter First Name</string>
     <string name="questionWord">Question</string>
     <string name="ask">Esaal</string>
     <string name="teacherRegisterWord">Teacher Registration</string>
@@ -115,8 +114,8 @@ Get answers to all questions in all subjects for different levels of education,
     <string name="description">Description</string>
     <string name="myBalance">My Balance</string>
     <string name="balance">Balance:</string>
-    <string name="questionsNumber">Number of Questions You Replied:</string>
-    <string name="getBalance">Get Balance</string>
+    <string name="questionsNumber">Number of Questions: </string>
+    <string name="requestBalance">Request My Balance</string>
     <string name="withdrawBalanceSuccess">Your Withdraw Balance Send Successfully ,  We will Go Back To You  at the Earliest</string>
     <string name="balanceLessThanRequired">Your Balance Less Than 3.5 KWD</string>
     <string name="waitingResponse">Your Withdraw request sent , please Wait Response</string>
@@ -148,4 +147,24 @@ Get answers to all questions in all subjects for different levels of education,
     <string name="noVideo">No Video Available For Showing</string>
     <string name="noImage">No Image Available For Showing</string>
     <string name="language2">عربي</string>
+    <string name="waitingForActivation">Wait For Activation The Account</string>
+    <string name="notActive">Your account not Active Yet</string>
+    <string name="editQuestion">Edit Question</string>
+    <string name="invalidPhoneNumber">Mobile Number is Incorrect</string>
+    <string name="login2">Login</string>
+    <string name="videoDuration">Video Duration Should be Less Than 120 seconds</string>
+    <string name="selectSubject">Please Select Subject</string>
+    <string name="addVideo">Add Video</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="continueAsGuest">Continue As a Guest</string>
+    <string name="done">Done</string>
+    <string name="terms">Terms and Conditions</string>
+    <string name="agree">Agree For</string>
+    <string name="agreeRequired">Please Agree For Terms And Conditions</string>
+    <string name="all">All</string>
+    <string name="remainsQuestions">Remains Questions</string>
+    <string name="questions">Questions</string>
+    <string name="question">Questions</string>
+
 </resources>

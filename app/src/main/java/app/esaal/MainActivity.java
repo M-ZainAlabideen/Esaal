@@ -1,11 +1,15 @@
 package app.esaal;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.CountDownTimer;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.SubscriptionPlan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -32,6 +36,7 @@ import app.esaal.webservices.EsaalApiConfig;
 import app.esaal.webservices.responses.notifications.Notification;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import me.leolin.shortcutbadger.ShortcutBadger;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -55,8 +60,8 @@ public class MainActivity extends AppCompatActivity {
     public static ImageView notifiDash;
     public static ImageView moreDash;
     public static boolean isEnglish;
-    public static boolean hasNewNotifications;
     public static SessionManager sessionManager;
+    public static boolean hasNewNotifications;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -70,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         GlobalFunctions.setDefaultLanguage(this);
         GlobalFunctions.setUpFont(this);
+        GlobalFunctions.hasNewNotificationsApi(this);
         sessionManager = new SessionManager(this);
 
         appbar = (ConstraintLayout) findViewById(R.id.activity_main_cl_appbar);
@@ -96,21 +102,12 @@ public class MainActivity extends AppCompatActivity {
             title.setTypeface(arBold);
         }
 
-        if (sessionManager.isLoggedIn()) {
-            if (sessionManager.isTeacher()) {
-                Navigator.loadFragment(this, HomeFragment.newInstance(this), R.id.activity_main_fl_container, false);
-            } else {
-                if (sessionManager.hasPackage()) {
-                    Navigator.loadFragment(this, HomeFragment.newInstance(this), R.id.activity_main_fl_container, false);
-                } else {
-                    Navigator.loadFragment(this, LoginFragment.newInstance(this), R.id.activity_main_fl_container, false);
-                }
-            }
+        if (sessionManager.isGuest() || sessionManager.isLoggedIn()) {
+            Navigator.loadFragment(this, HomeFragment.newInstance(this), R.id.activity_main_fl_container, false);
         } else {
             Navigator.loadFragment(this, LoginFragment.newInstance(this), R.id.activity_main_fl_container, false);
         }
 
-        newNotifications();
     }
 
 
@@ -121,8 +118,14 @@ public class MainActivity extends AppCompatActivity {
         }
         if (!search.isIconified()) {
             search.onActionViewCollapsed();
-        } else
-            onBackPressed();
+        } else {
+            if (getSupportFragmentManager().findFragmentByTag("backPackage") != null && getSupportFragmentManager().findFragmentByTag("backPackage").isVisible()) {
+                clearStack();
+                Navigator.loadFragment(this, HomeFragment.newInstance(this), R.id.activity_main_fl_container, false);
+            } else {
+                onBackPressed();
+            }
+        }
     }
 
     @Override
@@ -135,7 +138,11 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.activity_main_iv_addQuestion)
     public void addQuestionCLick() {
-        Navigator.loadFragment(MainActivity.this, AddQuestionFragment.newInstance(MainActivity.this, "add", null), R.id.activity_main_fl_container, true);
+        if (sessionManager.isGuest()) {
+            Navigator.loadFragment(MainActivity.this, LoginFragment.newInstance(MainActivity.this), R.id.activity_main_fl_container, false);
+        } else {
+            Navigator.loadFragment(MainActivity.this, AddQuestionFragment.newInstance(MainActivity.this, "add", null), R.id.activity_main_fl_container, true);
+        }
     }
 
     @OnClick(R.id.activity_main_ll_homeContainer)
@@ -145,12 +152,20 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.activity_main_ll_accountContainer)
     public void accountCLick() {
-        Navigator.loadFragment(MainActivity.this, MyAccountFragment.newInstance(MainActivity.this), R.id.activity_main_fl_container, true);
+        if (sessionManager.isGuest()) {
+            Navigator.loadFragment(MainActivity.this, LoginFragment.newInstance(MainActivity.this), R.id.activity_main_fl_container, false);
+        } else {
+            Navigator.loadFragment(MainActivity.this, MyAccountFragment.newInstance(MainActivity.this), R.id.activity_main_fl_container, true);
+        }
     }
 
     @OnClick(R.id.activity_main_ll_notifiContainer)
     public void notificationCLick() {
-        Navigator.loadFragment(MainActivity.this, NotificationsFragment.newInstance(MainActivity.this), R.id.activity_main_fl_container, true);
+        if (sessionManager.isGuest()) {
+            Navigator.loadFragment(MainActivity.this, LoginFragment.newInstance(MainActivity.this), R.id.activity_main_fl_container, false);
+        } else {
+            Navigator.loadFragment(MainActivity.this, NotificationsFragment.newInstance(MainActivity.this), R.id.activity_main_fl_container, true);
+        }
     }
 
     @OnClick(R.id.activity_main_ll_moreContainer)
@@ -236,30 +251,33 @@ public class MainActivity extends AppCompatActivity {
         addQuestion.setVisibility(View.GONE);
     }
 
-    private void newNotifications() {
-        EsaalApiConfig.getCallingAPIInterface().notifications(
-                sessionManager.getUserToken(),
-                sessionManager.getUserId(),
-                new Callback<ArrayList<Notification>>() {
-                    @Override
-                    public void success(ArrayList<Notification> notifications, Response response) {
-                        int status = response.getStatus();
-                        if (status == 200) {
-                            if (notifications != null && notifications.size() > 0) {
-                                for (Notification value : notifications) {
-                                    if (!value.isRead) {
-                                        hasNewNotifications = true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-
-                    }
-                }
-        );
+    private void clearStack() {
+        FragmentManager fm = getSupportFragmentManager();
+        for (int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+            fm.popBackStack();
+        }
     }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        gotoDetails(intent);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        gotoDetails(getIntent());
+
+    }
+
+    private void gotoDetails(Intent intent) {
+        if (intent.hasExtra("Id")) {
+            if (intent.getStringExtra("type").equalsIgnoreCase("Q")) {
+                Navigator.loadFragment(this, QuestionDetailsFragment.newInstance(this, Integer.parseInt(intent.getStringExtra("Id"))),
+                        R.id.activity_main_fl_container, true);
+            }
+        }
+    }
+
 }

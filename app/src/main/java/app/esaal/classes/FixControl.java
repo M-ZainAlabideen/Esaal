@@ -24,13 +24,22 @@ public class FixControl {
             return false;
         }
         else {
-              String EMAIL_PATTERN =
+            String EMAIL_PATTERN =
                     "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
                             + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
             return Pattern.compile(EMAIL_PATTERN).matcher(email).matches();
         }
     }
 
+    public final static  boolean isValidPhone(String phone){
+        if(phone==null){
+            return false;
+        }
+        else {
+            String regex = "[0-9]+";
+            return phone.matches(regex) && phone.length() >= 8;
+        }
+    }
 
     public static int getImageHeight(Context context, int resId){
 

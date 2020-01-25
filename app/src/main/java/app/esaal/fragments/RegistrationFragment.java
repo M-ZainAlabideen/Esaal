@@ -11,13 +11,16 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -25,6 +28,10 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
 import com.nguyenhoanglam.imagepicker.model.Config;
 import com.nguyenhoanglam.imagepicker.model.Image;
 import com.nguyenhoanglam.imagepicker.ui.imagepicker.ImagePicker;
@@ -69,19 +76,15 @@ public class RegistrationFragment extends Fragment {
     private boolean isGulfCountry;
     private int countryId;
     public static ArrayList<Integer> subjectsIds = new ArrayList<>();
-    private TypedFile imageTypedFile, civilIdFrontFile, civilIdBackFile, certificationFile;
+    private TypedFile civilIdFrontFile, civilIdBackFile, certificationFile;
     private String type;
+    private String regId = "";
+
 
     @BindView(R.id.fragment_registration_nestedsv_scrollContainer)
     NestedScrollView scrollContainer;
     @BindView(R.id.fragment_registration_cl_container)
     ConstraintLayout container;
-    @BindView(R.id.fragment_registration_iv_profileImg)
-    ImageView profileImg;
-    @BindView(R.id.fragment_registration_iv_add)
-    ImageView add;
-    @BindView(R.id.fragment_registration_tv_addImgTv)
-    TextView addImgTv;
     @BindView(R.id.fragment_registration_et_firstName)
     EditText firstName;
     @BindView(R.id.fragment_registration_et_middleName)
@@ -131,6 +134,10 @@ public class RegistrationFragment extends Fragment {
     TextView civilIdBackTv;
     @BindView(R.id.fragment_registration_stv_subjects)
     StaggeredTextGridView subjects;
+    @BindView(R.id.fragment_registration_cb_agree)
+    CheckBox agree;
+    @BindView(R.id.fragment_registration_tv_terms)
+    TextView terms;
     @BindView(R.id.loading)
     ProgressBar loading;
     @BindView(R.id.loading2)
@@ -159,29 +166,27 @@ public class RegistrationFragment extends Fragment {
         loading2.setVisibility(View.GONE);
         //GONE those components in general cases , then in case of Teacher registration and select country the required components will be visible
         accountNum.setVisibility(View.GONE);
-        swiftCode.setVisibility(View.GONE);
         bankAddress.setVisibility(View.GONE);
-        bankName.setVisibility(View.GONE);
-        IBAN.setVisibility(View.GONE);
         personalAddress.setVisibility(View.GONE);
+        bankName.setVisibility(View.GONE);
+        swiftCode.setVisibility(View.GONE);
+        IBAN.setVisibility(View.GONE);
 
         String titleValue;
         if (sessionManager.isTeacher()) {
             titleValue = getString(R.string.teacherRegisterWord);
-            subjectsAdapter = new StaggeredSubjectsAdapter(activity, subjectsList, subjectsIds,false);
+            subjectsAdapter = new StaggeredSubjectsAdapter(activity, subjectsList, subjectsIds, false);
             subjects.setAdapter(subjectsAdapter);
             container.setVisibility(View.GONE);
             if (countriesList.size() > 0) {
                 loading.setVisibility(View.GONE);
+                container.setVisibility(View.VISIBLE);
             } else {
                 countriesApi();
             }
 
         } else {
             titleValue = getString(R.string.studentRegisterWord);
-            add.setVisibility(View.GONE);
-            profileImg.setVisibility(View.GONE);
-            addImgTv.setVisibility(View.GONE);
             loading.setVisibility(View.GONE);
             attachWord.setVisibility(View.GONE);
             subjectsWord.setVisibility(View.GONE);
@@ -199,7 +204,20 @@ public class RegistrationFragment extends Fragment {
         }
         MainActivity.setupAppbar(true, false, false, false, "", titleValue);
 
+        agree.setOnCheckedChangeListener(checkedListener);
     }
+
+    CompoundButton.OnCheckedChangeListener checkedListener = new CompoundButton.OnCheckedChangeListener() {
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            if (!isChecked) {
+                buttonView.setChecked(false);
+            } else {
+                buttonView.setChecked(true);
+            }
+        }
+    };
 
     private void captureImage() {
         ImagePicker.with(this)              //  Initialize ImagePicker with activity or fragment context
@@ -216,14 +234,9 @@ public class RegistrationFragment extends Fragment {
 
     @OnClick(R.id.fragment_registration_tv_country)
     public void countryClick() {
-        createSignUpPopUp(activity, countriesList);
+        countriesPopUp(activity, countriesList);
     }
 
-    @OnClick(R.id.fragment_registration_iv_profileImg)
-    public void profileImgClick() {
-        type = "profile";
-        captureImage();
-    }
 
     @OnClick(R.id.fragment_registration_iv_civilIdFront)
     public void civilIdFrontClick() {
@@ -251,14 +264,7 @@ public class RegistrationFragment extends Fragment {
             ArrayList<Image> images = data.getParcelableArrayListExtra(Config.EXTRA_IMAGES);
             if (images != null) {
                 for (Image uri : images) {
-                    if (type.equals("profile")) {
-                        imageTypedFile = new TypedFile("image/*", new File(uri.getPath()));
-                        Glide.with(activity)
-                                .load(uri.getPath())
-                                .apply(new RequestOptions().placeholder(R.mipmap.placeholder_attach)
-                                        .error(R.mipmap.placeholder_attach))
-                                .into(profileImg);
-                    } else if (type.equals("back")) {
+                    if (type.equals("back")) {
                         civilIdBackFile = new TypedFile("image/*", new File(uri.getPath()));
                         Glide.with(activity)
                                 .load(uri.getPath())
@@ -286,6 +292,11 @@ public class RegistrationFragment extends Fragment {
 
     }
 
+
+    @OnClick(R.id.fragment_registration_tv_terms)
+    public void termsClick() {
+        Navigator.loadFragment(activity, AboutUsFragment.newInstance(activity, true), R.id.activity_main_fl_container, true);
+    }
 
     @OnClick(R.id.fragment_registration_tv_done)
     public void doneClick() {
@@ -328,10 +339,13 @@ public class RegistrationFragment extends Fragment {
             Snackbar.make(loading, getString(R.string.enterPassword), Snackbar.LENGTH_SHORT).show();
         } else if (!FixControl.isValidEmail(emailStr)) {
             Snackbar.make(loading, getString(R.string.invalidEmail), Snackbar.LENGTH_SHORT).show();
-        } else if (passwordStr.length() < 3) {
+        } else if (mobileStr.length() < 8 || !FixControl.isValidPhone(mobileStr)) {
+            Snackbar.make(loading, getString(R.string.invalidPhoneNumber), Snackbar.LENGTH_SHORT).show();
+        } else if (passwordStr.length() < 6) {
             Snackbar.make(loading, getString(R.string.invalidPassword), Snackbar.LENGTH_SHORT).show();
+        } else if (!agree.isChecked()) {
+            Snackbar.make(loading, getString(R.string.agreeRequired), Snackbar.LENGTH_SHORT).show();
         } else {
-
             if (sessionManager.isTeacher()) {
                 if (countryStr.equals(getString(R.string.country))) {
                     Snackbar.make(loading, getString(R.string.selectYourCountry), Snackbar.LENGTH_SHORT).show();
@@ -339,7 +353,7 @@ public class RegistrationFragment extends Fragment {
                     Snackbar.make(loading, getString(R.string.enterBankName), Snackbar.LENGTH_SHORT).show();
                 } else if (swiftCodeStr == null || swiftCodeStr.isEmpty()) {
                     Snackbar.make(loading, getString(R.string.enterSwiftCode), Snackbar.LENGTH_SHORT).show();
-                } else if (isGulfCountry && (IBANStr == null || IBANStr.isEmpty())) {
+                } else if (IBANStr == null || IBANStr.isEmpty()) {
                     Snackbar.make(loading, getString(R.string.enterIBAN), Snackbar.LENGTH_SHORT).show();
                 } else if (!isGulfCountry && (accountNumStr == null || accountNumStr.isEmpty())) {
                     Snackbar.make(loading, getString(R.string.enterAccountNumber), Snackbar.LENGTH_SHORT).show();
@@ -360,7 +374,7 @@ public class RegistrationFragment extends Fragment {
                             firstNameStr, middleNameStr, lastNameStr, mobileStr, emailStr, userNameStr, passwordStr
                             , subjectsIdsStr, swiftCodeStr, bankNameStr, accountNumStr
                             , countryId, IBANStr, bankAddressStr, personalAddressStr, descriptionStr,
-                            imageTypedFile, civilIdFrontFile, civilIdBackFile, certificationFile);
+                            null, civilIdFrontFile, civilIdBackFile, certificationFile);
                 }
 
             } else {
@@ -378,17 +392,18 @@ public class RegistrationFragment extends Fragment {
     }
 
 
-    public void createSignUpPopUp(final Context context, final ArrayList<Country> countriesList) {
+    public void countriesPopUp(final Context context, final ArrayList<Country> countriesList) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        View popUpView = ((Activity) context).getLayoutInflater().inflate(R.layout.custom_dialog_filter, null);
-        RecyclerView popUpRecycler = (RecyclerView) popUpView.findViewById(R.id.custom_dialog_filter_rv_filterBy);
-        TextView title = (TextView) popUpView.findViewById(R.id.custom_dialog_filter_tv_title);
+        View countriesView = ((Activity) context).getLayoutInflater().inflate(R.layout.custom_dialog_filter, null);
+        RecyclerView popUpRecycler = (RecyclerView) countriesView.findViewById(R.id.custom_dialog_filter_rv_filterBy);
+        TextView title = (TextView) countriesView.findViewById(R.id.custom_dialog_filter_tv_title);
+        TextView done = (TextView) countriesView.findViewById(R.id.custom_dialog_filter_tv_done);
         title.setText(getString(R.string.selectCountry));
-
+        done.setVisibility(View.GONE);
         popUpRecycler.setLayoutManager(new GridLayoutManager(context, 3));
         popUpRecycler.setAdapter(new FilterAdapter(context, null, countriesList));
         builder.setCancelable(true);
-        builder.setView(popUpView);
+        builder.setView(countriesView);
         dialog = builder.create();
         dialog.show();
         popUpRecycler.addOnItemTouchListener(new RecyclerItemClickListener(context, popUpRecycler, new RecyclerItemClickListener.OnItemClickListener() {
@@ -399,9 +414,9 @@ public class RegistrationFragment extends Fragment {
                 countryId = countriesList.get(position).id;
                 swiftCode.setVisibility(View.VISIBLE);
                 bankName.setVisibility(View.VISIBLE);
-                if (isGulfCountry) {
-                    IBAN.setVisibility(View.VISIBLE);
+                IBAN.setVisibility(View.VISIBLE);
 
+                if (isGulfCountry) {
                     accountNum.setVisibility(View.GONE);
                     bankAddress.setVisibility(View.GONE);
                     personalAddress.setVisibility(View.GONE);
@@ -409,8 +424,6 @@ public class RegistrationFragment extends Fragment {
                     accountNum.setVisibility(View.VISIBLE);
                     bankAddress.setVisibility(View.VISIBLE);
                     personalAddress.setVisibility(View.VISIBLE);
-
-                    IBAN.setVisibility(View.GONE);
 
                 }
                 closePopUp();
@@ -430,29 +443,34 @@ public class RegistrationFragment extends Fragment {
 
     private void studentSignUp(StudentRequest student) {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().studentSignUp(
                 student, new Callback<UserResponse>() {
                     @Override
                     public void success(UserResponse userResponse, Response response) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
-                            GlobalFunctions.clearLastStack(activity);
-                            setupSession(userResponse);
-                            Navigator.loadFragment(activity, PackagesFragment.newInstance(activity,"registration"), R.id.activity_main_fl_container, false);
+                            if (userResponse.user.isActive) {
+                                registrationFirebase();
+                                clearStack();
+                                setupSession(userResponse);
+                                Navigator.loadFragmentPackages(activity, PackagesFragment.newInstance(activity, "registration"), R.id.activity_main_fl_container, "backPackage");
+                            }
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
                         loading.setVisibility(View.GONE);
-                        int failureStatus = error.getResponse().getStatus();
-                        if (failureStatus == 201) {
-                            Snackbar.make(loading, getString(R.string.emailExists), Snackbar.LENGTH_SHORT).show();
-                        } else if (failureStatus == 202) {
-                            Snackbar.make(loading, getString(R.string.userNameExists), Snackbar.LENGTH_SHORT).show();
-                        } else if (failureStatus == 203) {
+                        GlobalFunctions.EnableLayout(container);
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 203) {
                             Snackbar.make(loading, getString(R.string.mobileExists), Snackbar.LENGTH_SHORT).show();
+                        } else if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
+                            Snackbar.make(loading, getString(R.string.emailExists), Snackbar.LENGTH_SHORT).show();
+                        } else if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
+                            Snackbar.make(loading, getString(R.string.userNameExists), Snackbar.LENGTH_SHORT).show();
                         } else {
                             GlobalFunctions.generalErrorMessage(loading, activity);
                         }
@@ -469,6 +487,8 @@ public class RegistrationFragment extends Fragment {
                                   String description, TypedFile userImage,
                                   TypedFile civilIdFront, TypedFile civilIdBack, TypedFile certification) {
         loading2.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
+
         EsaalApiConfig.getCallingAPIInterface().teacherSignUp(
                 firstName, middleName, lastName, phone, email, userName, password, subjectsIds,
                 countryId, IBAN, swiftCode, accountNum, bankName, bankAddress, personalAddress,
@@ -479,22 +499,32 @@ public class RegistrationFragment extends Fragment {
                     public void success(UserResponse userResponse, Response response) {
                         int status = response.getStatus();
                         loading2.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         if (status == 200) {
-                            setupSession(userResponse);
-                            Snackbar.make(loading, getString(R.string.accountCreatedSuccessfully), Snackbar.LENGTH_SHORT).show();
-                            Navigator.loadFragment(activity, HomeFragment.newInstance(activity), R.id.activity_main_fl_container, false);
+                            clearStack();
+                            if (userResponse.user.isActive) {
+                                registrationFirebase();
+                                setupSession(userResponse);
+                                Snackbar.make(loading, getString(R.string.accountCreatedSuccessfully), Snackbar.LENGTH_SHORT).show();
+                                Navigator.loadFragment(activity, HomeFragment.newInstance(activity), R.id.activity_main_fl_container, false);
+                            } else {
+                                //make isTeacher false again till the admin activate the account
+                                sessionManager.setTeacher(false);
+                                Snackbar.make(loading, getString(R.string.waitingForActivation), Snackbar.LENGTH_SHORT).show();
+                                Navigator.loadFragment(activity, LoginFragment.newInstance(activity), R.id.activity_main_fl_container, false);
+                            }
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
                         loading2.setVisibility(View.GONE);
-                        int failureStatus = error.getResponse().getStatus();
-                        if (failureStatus == 201) {
+                        GlobalFunctions.EnableLayout(container);
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
                             Snackbar.make(loading, getString(R.string.emailExists), Snackbar.LENGTH_SHORT).show();
-                        } else if (failureStatus == 202) {
+                        } else if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
                             Snackbar.make(loading, getString(R.string.userNameExists), Snackbar.LENGTH_SHORT).show();
-                        } else if (failureStatus == 203) {
+                        } else if (error.getResponse() != null && error.getResponse().getStatus() == 203) {
                             Snackbar.make(loading, getString(R.string.mobileExists), Snackbar.LENGTH_SHORT).show();
                         } else {
                             GlobalFunctions.generalErrorMessage(loading2, activity);
@@ -506,6 +536,7 @@ public class RegistrationFragment extends Fragment {
     }
 
     private void setupSession(UserResponse userResponse) {
+        sessionManager.guestLogout();
         sessionManager.setUserToken(userResponse.token);
         sessionManager.setUserId(userResponse.user.id);
         sessionManager.setTeacher(userResponse.user.isTeacher);
@@ -523,15 +554,14 @@ public class RegistrationFragment extends Fragment {
                         int status = response.getStatus();
                         if (status == 200) {
                             subjectsList.addAll(subjects);
-                            subjectsAdapter = new StaggeredSubjectsAdapter(activity, subjectsList,null,false);
+                            subjectsAdapter = new StaggeredSubjectsAdapter(activity, subjectsList, null, false);
                             fragment.subjects.setAdapter(subjectsAdapter);
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                        int failureStatus = error.getResponse().getStatus();
-                        if (failureStatus == 202) {
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
                             Snackbar.make(loading, getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
                         } else {
                             GlobalFunctions.generalErrorMessage(loading, activity);
@@ -561,5 +591,55 @@ public class RegistrationFragment extends Fragment {
         );
     }
 
+
+    private void clearStack() {
+        FragmentManager fm = activity.getSupportFragmentManager();
+        for (int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+            fm.popBackStack();
+        }
+    }
+
+    private void registrationFirebase() {
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w("login", "getInstanceId failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        regId = task.getResult().getToken();
+
+                        Log.e("registrationId", "regId -> " + regId);
+
+                        insertTokenApi(regId);
+
+
+                    }
+                });
+    }
+
+    private void insertTokenApi(final String regId) {
+        EsaalApiConfig.getCallingAPIInterface().addDeviceToken(
+                sessionManager.getUserToken(),
+                sessionManager.getUserId(),
+                regId, 2,
+                new Callback<Response>() {
+                    @Override
+                    public void success(Response response, Response response2) {
+                        if (response.getStatus() == 200) {
+                            sessionManager.setRegId(regId);
+                        }
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+
+                    }
+                }
+        );
+    }
 }
 

@@ -8,14 +8,24 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+
+import java.util.ArrayList;
+
 import app.esaal.MainActivity;
 import app.esaal.R;
+import app.esaal.SplashActivity;
 import app.esaal.classes.FixControl;
 import app.esaal.classes.GlobalFunctions;
 import app.esaal.classes.LocaleHelper;
@@ -24,9 +34,11 @@ import app.esaal.classes.SessionManager;
 import app.esaal.webservices.EsaalApiConfig;
 import app.esaal.webservices.requests.LoginRequest;
 import app.esaal.webservices.responses.authorization.UserResponse;
+import app.esaal.webservices.responses.notifications.Notification;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import me.leolin.shortcutbadger.ShortcutBadger;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -35,6 +47,7 @@ public class LoginFragment extends Fragment {
     public static FragmentActivity activity;
     public static LoginFragment fragment;
     public SessionManager sessionManager;
+    String regId = "";
 
     @BindView(R.id.fragment_login_cl_container)
     ConstraintLayout container;
@@ -67,10 +80,11 @@ public class LoginFragment extends Fragment {
         FixControl.setupUI(container, activity);
         FixControl.closeKeyboardWhenFragmentStart(activity);
         sessionManager = new SessionManager(activity);
+
     }
 
     @OnClick(R.id.fragment_login_tv_language)
-    public void languageClick(){
+    public void languageClick() {
         changeLanguage();
     }
 
@@ -98,11 +112,17 @@ public class LoginFragment extends Fragment {
         }
     }
 
+    @OnClick(R.id.fragment_login_tv_continueAsGuest)
+    public void continueAsGuestClick() {
+        sessionManager.guestSession();
+        Navigator.loadFragment(activity, HomeFragment.newInstance(activity), R.id.activity_main_fl_container, false);
+    }
 
-    private void changeLanguage(){
-         /*for changing the sessionManager.getUserLanguage() of App
-        1- check the value of sessionManager.getUserLanguage() in sharedPreference and Reflects the sessionManager.getUserLanguage()
-         2- set the new value of sessionManager.getUserLanguage() in local and change the value of sharedPreference to new value
+
+    private void changeLanguage() {
+         /*for changing the language of App
+        1- check the value of currentLanguage and Reflects it
+         2- set the new value of language in local and change the value of language sharedPreference to new value
          3- restart the mainActivity with noAnimation
         * */
 
@@ -126,6 +146,7 @@ public class LoginFragment extends Fragment {
 
     private void loginApi(String userName, String password) {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         final LoginRequest loginRequest = new LoginRequest();
         loginRequest.userName = userName;
         loginRequest.password = password;
@@ -134,26 +155,34 @@ public class LoginFragment extends Fragment {
                     @Override
                     public void success(UserResponse userResponse, Response response) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
-                            setupSession(userResponse);
-                            if (sessionManager.isTeacher()) {
-                                Navigator.loadFragment(activity, HomeFragment.newInstance(activity), R.id.activity_main_fl_container, false);
+                            clearStack();
+                            if (userResponse.user.isTeacher) {
+                                if (userResponse.user.isActive) {
+                                    setupSession(userResponse);
+                                    Navigator.loadFragment(activity, HomeFragment.newInstance(activity), R.id.activity_main_fl_container, true);
+                                } else {
+                                    Snackbar.make(loading, getString(R.string.notActive), Snackbar.LENGTH_SHORT).show();
+                                }
                             } else {
                                 if (userResponse.hasPackages) {
                                     sessionManager.setPackage(true);
                                     Navigator.loadFragment(activity, HomeFragment.newInstance(activity), R.id.activity_main_fl_container, false);
                                 } else {
-                                    Navigator.loadFragment(activity, PackagesFragment.newInstance(activity, "addPackage"), R.id.activity_main_fl_container, false);
+                                    Navigator.loadFragmentPackages(activity, PackagesFragment.newInstance(activity, "addPackage"), R.id.activity_main_fl_container, "backPackage");
                                 }
+                                setupSession(userResponse);
+                                registrationFirebase();
                             }
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                        int failureStatus = error.getResponse().getStatus();
-                        if (failureStatus == 400) {
+                        GlobalFunctions.EnableLayout(container);
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 400) {
                             loading.setVisibility(View.GONE);
                             Snackbar.make(loading, getString(R.string.invalidLogin), Snackbar.LENGTH_SHORT).show();
                         } else {
@@ -164,6 +193,7 @@ public class LoginFragment extends Fragment {
     }
 
     private void setupSession(UserResponse userResponse) {
+        sessionManager.guestLogout();
         sessionManager.setUserToken(userResponse.token);
         sessionManager.setUserId(userResponse.user.id);
         sessionManager.setTeacher(userResponse.user.isTeacher);
@@ -172,4 +202,52 @@ public class LoginFragment extends Fragment {
         sessionManager.LoginSession();
     }
 
+
+    private void clearStack() {
+        FragmentManager fm = activity.getSupportFragmentManager();
+        for (int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+            fm.popBackStack();
+        }
+    }
+
+    private void insertTokenApi(final String regId) {
+        EsaalApiConfig.getCallingAPIInterface().addDeviceToken(
+                sessionManager.getUserToken(),
+                sessionManager.getUserId(),
+                regId, 2,
+                new Callback<Response>() {
+                    @Override
+                    public void success(Response response, Response response2) {
+                        if (response.getStatus() == 200) {
+                            sessionManager.setRegId(regId);
+                        }
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+
+                    }
+                }
+        );
+    }
+
+    private void registrationFirebase() {
+        FirebaseInstanceId.getInstance().getInstanceId()
+                .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                        if (!task.isSuccessful()) {
+                            Log.w("login", "getInstanceId failed", task.getException());
+                            return;
+                        }
+
+                        // Get new Instance ID token
+                        regId = task.getResult().getToken();
+
+                        Log.e("registrationId", "regId -> " + regId);
+
+                        insertTokenApi(regId);
+                    }
+                });
+    }
 }

@@ -65,24 +65,26 @@ public class PaymentsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         MainActivity.setupAppbar(true, true, false, false, "account", getString(R.string.payments));
         sessionManager = new SessionManager(activity);
+        GlobalFunctions.hasNewNotificationsApi(activity);
+
         layoutManager = new LinearLayoutManager(activity);
-        paymentsAdapter = new PaymentsAdapter(activity,paymentsList);
+        paymentsAdapter = new PaymentsAdapter(activity, paymentsList);
         payments.setLayoutManager(layoutManager);
         payments.setAdapter(paymentsAdapter);
 
-        if(paymentsList.size() > 0){
+        if (paymentsList.size() > 0) {
             loading.setVisibility(View.GONE);
-        }
-        else{
+        } else {
             paymentsApi();
         }
     }
 
     @OnClick(R.id.fragment_payments_ll_addPackage)
-    public void addPackageClick(){
-        Navigator.loadFragment(activity, PackagesFragment.newInstance(activity,"addPackage"),R.id.activity_main_fl_container,true);
+    public void addPackageClick() {
+        Navigator.loadFragment(activity, PackagesFragment.newInstance(activity, "addPackage"), R.id.activity_main_fl_container, true);
     }
-    private void paymentsApi(){
+
+    private void paymentsApi() {
         EsaalApiConfig.getCallingAPIInterface().payments(
                 sessionManager.getUserToken(),
                 sessionManager.getUserId(),
@@ -91,26 +93,21 @@ public class PaymentsFragment extends Fragment {
                     public void success(ArrayList<Payment> payments, Response response) {
                         loading.setVisibility(View.GONE);
                         int status = response.getStatus();
-                        if(status == 200){
-                            if(payments.size() > 0){
+                        if (status == 200) {
+                            if (payments.size() > 0) {
                                 paymentsList.addAll(payments);
                                 paymentsAdapter.notifyDataSetChanged();
-                            }
-                            else{
-                                Snackbar.make(loading,getString(R.string.noPayments),Snackbar.LENGTH_SHORT).show();
                             }
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                        int failureStatus = error.getResponse().getStatus();
-                        if(failureStatus == 204){
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 204) {
                             loading.setVisibility(View.GONE);
-                            Snackbar.make(loading,getString(R.string.noPayments),Snackbar.LENGTH_SHORT).show();
-                        }
-                        else{
-                            GlobalFunctions.generalErrorMessage(loading,activity);
+                            Snackbar.make(loading, getString(R.string.noPayments), Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            GlobalFunctions.generalErrorMessage(loading, activity);
                         }
                     }
                 }

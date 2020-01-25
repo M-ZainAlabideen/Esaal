@@ -1,14 +1,12 @@
 package app.esaal.fragments;
 
-import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
-import android.media.MediaMetadataRetriever;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,6 +16,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,16 +24,17 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.nguyenhoanglam.imagepicker.model.Config;
 import com.nguyenhoanglam.imagepicker.model.Image;
 import com.nguyenhoanglam.imagepicker.ui.imagepicker.ImagePicker;
+import com.vincent.videocompressor.VideoCompress;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import app.esaal.MainActivity;
 import app.esaal.R;
@@ -63,16 +63,17 @@ public class AddQuestionFragment extends Fragment {
     private SessionManager sessionManager;
     private Question question;
     private String comingFrom;
+    private AlertDialog dialog;
 
     private TypedFile imageTypedFile, videoTypedFile;
-    private String imageUrl,videoUrl;
+    private String imageUrl, videoUrl;
     private final int REQUEST_TAKE_GALLERY_VIDEO = 101;
+    private final int REQUEST_TAKE_CAMERA_VIDEO = 102;
 
     private ArrayList<Subject> subjectsList = new ArrayList<>();
     private SubjectsAdapter subjectsAdapter;
     private LinearLayoutManager layoutManager;
     public static int selectedSubjectId;
-
 
     @BindView(R.id.fragment_add_question_cl_container)
     ConstraintLayout container;
@@ -121,19 +122,27 @@ public class AddQuestionFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        MainActivity.setupAppbar(true,true,false,false,"account",getString(R.string.addQuestion));
         FixControl.setupUI(container, activity);
         sessionManager = new SessionManager(activity);
         container.setVisibility(View.GONE);
         subjectName.setVisibility(View.GONE);
         deleteImgAttach.setVisibility(View.GONE);
         deleteVideoAttach.setVisibility(View.GONE);
+        imgAttach.setVisibility(View.GONE);
+        videoAttach.setVisibility(View.GONE);
+        play.setVisibility(View.GONE);
+
+        selectedSubjectId = -1;
         comingFrom = getArguments().getString("comingFrom");
         question = (Question) getArguments().getSerializable("question");
 
         if (comingFrom.equals("update")) {
             setDataForUpdating();
+            MainActivity.setupAppbar(true, true, false, false, "account", getString(R.string.editQuestion));
+        } else {
+            MainActivity.setupAppbar(true, true, false, false, "account", getString(R.string.addQuestion));
         }
+        GlobalFunctions.hasNewNotificationsApi(activity);
 
         layoutManager = new LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false);
         subjectsAdapter = new SubjectsAdapter(activity, subjectsList);
@@ -160,32 +169,87 @@ public class AddQuestionFragment extends Fragment {
 
     @OnClick(R.id.fragment_add_question_iv_captureImg)
     public void captureImgClick() {
-        if(imageUrl == null) {
-            ImagePicker.with(this)              //  Initialize ImagePicker with activity or fragment context
-                    .setCameraOnly(false)               //  Camera mode
-                    .setMultipleMode(false)              //  Select multiple images or single image
-                    .setFolderMode(true)                //  Folder mode
-                    .setShowCamera(true)                //  Show camera button
-                    .setMaxSize(1)                     //  Max images can be selected
-                    .setSavePath("ImagePicker")         //  Image capture folder name
-                    .setAlwaysShowDoneButton(true)      //  Set always show done button in multiple mode
-                    .setKeepScreenOn(true)              //  Keep screen on when selecting images
-                    .start();
+        if (imageUrl == null) {
+            if (!GlobalFunctions.isWriteExternalStorageAllowed(activity)) {
+                GlobalFunctions.requestWriteExternalStoragePermission(activity);
+            } else if (!GlobalFunctions.isReadExternalStorageAllowed(activity)) {
+                GlobalFunctions.requestReadExternalStoragePermission(activity);
+            } else {
+                ImagePicker.with(this)              //  Initialize ImagePicker with activity or fragment context
+                        .setCameraOnly(false)               //  Camera mode
+                        .setMultipleMode(false)              //  Select multiple images or single image
+                        .setFolderMode(true)                //  Folder mode
+                        .setShowCamera(true)                //  Show camera button
+                        .setMaxSize(1)                     //  Max images can be selected
+                        .setSavePath("ImagePicker")         //  Image capture folder name
+                        .setAlwaysShowDoneButton(true)      //  Set always show done button in multiple mode
+                        .setKeepScreenOn(true)              //  Keep screen on when selecting images
+                        .start();
+            }
+        } else {
+            Snackbar.make(loading, getString(R.string.removeImgFirst), Snackbar.LENGTH_SHORT).show();
         }
-        else{
-            Snackbar.make(loading,getString(R.string.removeImgFirst),Snackbar.LENGTH_SHORT).show();
-        }
+
     }
 
     @OnClick(R.id.fragment_add_question_iv_captureVideo)
     public void captureVideoClick() {
-        if(videoUrl == null) {
-            final Intent intent1 = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-            startActivityForResult(Intent.createChooser(intent1, "Select Video"), REQUEST_TAKE_GALLERY_VIDEO);
+        if (videoUrl == null) {
+            if (!GlobalFunctions.isWriteExternalStorageAllowed(activity)) {
+                GlobalFunctions.requestWriteExternalStoragePermission(activity);
+            } else if (!GlobalFunctions.isReadExternalStorageAllowed(activity)) {
+                GlobalFunctions.requestReadExternalStoragePermission(activity);
+            } else if (!GlobalFunctions.isCameraPermission(activity)) {
+                GlobalFunctions.requestCameraPermission(activity);
+            } else {
+                createCaptureVideoMethodsDialog();
+            }
+        } else {
+            Snackbar.make(loading, getString(R.string.removeVideoFirst), Snackbar.LENGTH_SHORT).show();
         }
-        else{
-            Snackbar.make(loading,getString(R.string.removeVideoFirst),Snackbar.LENGTH_SHORT).show();
-        }
+    }
+
+    public void createCaptureVideoMethodsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        final View popUpView = activity.getLayoutInflater().inflate(R.layout.custom_dialog_capture_video, null);
+        TextView gallery = (TextView) popUpView.findViewById(R.id.custom_dialog_capture_video_tv_gallery);
+        TextView camera = (TextView) popUpView.findViewById(R.id.custom_dialog_capture_video_tv_camera);
+
+        builder.setView(popUpView);
+        dialog = builder.create();
+        dialog.show();
+
+        gallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chooseVideoFromGallery();
+                closePopUp();
+            }
+        });
+
+        camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                takeVideoFromCamera();
+                closePopUp();
+            }
+        });
+    }
+
+
+    public void closePopUp() {
+        dialog.cancel();
+
+    }
+
+    private void chooseVideoFromGallery() {
+        final Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(Intent.createChooser(intent, "Select Video"), REQUEST_TAKE_GALLERY_VIDEO);
+    }
+
+    private void takeVideoFromCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        startActivityForResult(intent, REQUEST_TAKE_CAMERA_VIDEO);
     }
 
     @Override
@@ -196,81 +260,132 @@ public class AddQuestionFragment extends Fragment {
             if (images != null) {
                 for (Image uri : images) {
                     imageTypedFile = new TypedFile("image/*", new File(uri.getPath()));
-                    Glide.with(activity)
-                            .load(uri.getPath())
-                            .apply(new RequestOptions().placeholder(R.mipmap.placeholder_attach)
-                                    .error(R.mipmap.placeholder_attach))
-                            .into(imgAttach);
-
+                   loadImages(uri.getPath(),imgAttach);
                 }
             }
-        } else if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
-                Uri selectedVideo = data.getData();
-                String[] filePathColumn = {MediaStore.Video.Media.DATA};
-                Cursor cursor = getActivity().getContentResolver().query(selectedVideo,
-                        filePathColumn, null, null, null);
-                cursor.moveToFirst();
-                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                String selectedVideoPath = cursor.getString(columnIndex);
-                videoTypedFile = new TypedFile("video/*", new File(selectedVideoPath));
-                Toast.makeText(activity, ""+selectedVideoPath.toString(), Toast.LENGTH_SHORT).show();
-
-                Bitmap bmThumbnail;
-                bmThumbnail = ThumbnailUtils.createVideoThumbnail(selectedVideoPath, MediaStore.Images.Thumbnails.MINI_KIND);
-                try {
-
-                    int Width = FixControl.getImageWidth(activity, R.mipmap.placeholder_attach);
-                    int Height = FixControl.getImageHeight(activity, R.mipmap.placeholder_attach);
-                    videoAttach.getLayoutParams().height = Height;
-                    videoAttach.getLayoutParams().width = Width;
-                    videoAttach.setImageBitmap(retriveVideoFrameFromVideo(selectedVideoPath));
-                } catch (Throwable throwable) {
-                    throwable.printStackTrace();
+        } else if (resultCode == RESULT_OK && data != null) {
+            Uri selectedVideoUri = data.getData();
+            String videoPath = "";
+            long videoDuration = checkVideoDurationValidation(selectedVideoUri);
+            if (videoDuration > 120000) {
+                Snackbar.make(loading, getString(R.string.videoDuration), Snackbar.LENGTH_SHORT).show();
+            } else {
+                if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
+                    videoPath = getPath(selectedVideoUri);
+                } else if (requestCode == REQUEST_TAKE_CAMERA_VIDEO) {
+                    videoPath = getRealPath(selectedVideoUri);
                 }
+                createCompressedVideoPath(videoPath);
             }
         }
 
         if (imageTypedFile == null) {
+            imgAttach.setVisibility(View.GONE);
             deleteImgAttach.setVisibility(View.GONE);
         } else {
+            imgAttach.setVisibility(View.VISIBLE);
             deleteImgAttach.setVisibility(View.VISIBLE);
-        }
-
-        if (videoTypedFile == null) {
-            deleteVideoAttach.setVisibility(View.GONE);
-        } else {
-            deleteVideoAttach.setVisibility(View.VISIBLE);
         }
 
     }
 
-    @SuppressLint("NewApi")
-    public static Bitmap retriveVideoFrameFromVideo(String p_videoPath)
-            throws Throwable
-    {
-        Bitmap m_bitmap = null;
-        MediaMetadataRetriever m_mediaMetadataRetriever = null;
-        try
-        {
-            m_mediaMetadataRetriever = new MediaMetadataRetriever();
-            m_mediaMetadataRetriever.setDataSource(p_videoPath);
-            m_bitmap = m_mediaMetadataRetriever.getFrameAtTime();
+    private void createCompressedVideoPath(String videoPath) {
+        String outputDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+        String outputPath = outputDir + File.separator + "VID_" + sessionManager.getUserId() + Calendar.getInstance().getTimeInMillis() + ".mp4";
+        compressVideo(videoPath, outputPath);
+    }
+
+    public String getPath(Uri uri) {
+        String[] projection = {MediaStore.Video.Media.DATA};
+        Cursor cursor = activity.getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } else
+            return null;
+    }
+
+    public String getRealPath(Uri uri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = activity.managedQuery(uri, projection, null, null, null);
+        if (cursor != null) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } else
+            return null;
+    }
+
+    private long checkVideoDurationValidation(Uri uri) {
+        Cursor cursor = MediaStore.Video.query(activity.getContentResolver(), uri, new
+                String[]{MediaStore.Video.VideoColumns.DURATION});
+        long duration = 0;
+        if (cursor != null && cursor.moveToFirst()) {
+            duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Video
+                    .VideoColumns.DURATION));
+            cursor.close();
         }
-        catch (Exception m_e)
-        {
-            throw new Throwable(
-                    "Exception in retriveVideoFrameFromVideo(String p_videoPath)"
-                            + m_e.getMessage());
-        }
-        finally
-        {
-            if (m_mediaMetadataRetriever != null)
-            {
-                m_mediaMetadataRetriever.release();
+
+        return duration;
+    }
+
+    private void compressVideo(String input, final String output) {
+        VideoCompress.VideoCompressTask task = VideoCompress.compressVideoLow(input, output, new VideoCompress.CompressListener() {
+            @Override
+            public void onStart() {
+                //Start Compress
+                loading.setVisibility(View.VISIBLE);
+                GlobalFunctions.DisableLayout(container);
+            }
+
+            @Override
+            public void onSuccess() {
+                //Finish successfully
+                loading.setVisibility(View.GONE);
+                GlobalFunctions.EnableLayout(container);
+                Log.d("VIDEO-TAG", output);
+                setVideo(output);
+            }
+
+            @Override
+            public void onFail() {
+                //Failed
+            }
+
+            @Override
+            public void onProgress(float percent) {
+                //Progress
+            }
+        });
+    }
+
+    private void setVideo(String finalVideoPath) {
+        if (finalVideoPath != null) {
+            videoTypedFile = new TypedFile("video/*", new File(finalVideoPath));
+
+            if (videoTypedFile == null) {
+                videoAttach.setVisibility(View.GONE);
+                play.setVisibility(View.GONE);
+                deleteVideoAttach.setVisibility(View.GONE);
+            } else {
+                videoAttach.setVisibility(View.VISIBLE);
+                play.setVisibility(View.VISIBLE);
+                deleteVideoAttach.setVisibility(View.VISIBLE);
+            }
+
+            try {
+                int Width = FixControl.getImageWidth(activity, R.mipmap.placeholder_attach);
+                int Height = FixControl.getImageHeight(activity, R.mipmap.placeholder_attach);
+                videoAttach.getLayoutParams().height = Height;
+                videoAttach.getLayoutParams().width = Width;
+                play.getLayoutParams().height = Height;
+                play.getLayoutParams().width = Width;
+                videoAttach.setImageBitmap(GlobalFunctions.loadVideoFrameFromPath(finalVideoPath));
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
             }
         }
-        return m_bitmap;
     }
 
     @OnClick(R.id.fragment_add_question_iv_deleteImgAttach)
@@ -286,6 +401,7 @@ public class AddQuestionFragment extends Fragment {
         }
         imgAttach.setImageResource(R.mipmap.placeholder_attach);
         imageTypedFile = null;
+        imgAttach.setVisibility(View.GONE);
         deleteImgAttach.setVisibility(View.GONE);
     }
 
@@ -302,6 +418,8 @@ public class AddQuestionFragment extends Fragment {
         }
         videoAttach.setImageResource(R.mipmap.placeholder_attach);
         videoTypedFile = null;
+        videoAttach.setVisibility(View.GONE);
+        play.setVisibility(View.GONE);
         deleteVideoAttach.setVisibility(View.GONE);
     }
 
@@ -314,7 +432,11 @@ public class AddQuestionFragment extends Fragment {
             if (comingFrom.equals("update")) {
                 updateQuestionApi(question.id, selectedSubjectId, sessionManager.getUserId(), questionTextStr);
             } else {
-                addQuestionApi(selectedSubjectId, questionTextStr);
+                if (selectedSubjectId == -1) {
+                    Snackbar.make(loading, getString(R.string.selectSubject), Snackbar.LENGTH_SHORT).show();
+                } else {
+                    addQuestionApi(selectedSubjectId, questionTextStr);
+                }
             }
         }
     }
@@ -331,17 +453,22 @@ public class AddQuestionFragment extends Fragment {
                         int status = response.getStatus();
                         if (status == 200) {
                             subjectsList.addAll(subjects);
-                            subjectsAdapter.notifyDataSetChanged();
-                            selectedSubjectId = subjectsList.get(0).id;
+
+                            if (comingFrom.equals("update")) {
+                                selectedSubjectId = question.subjectId;
+                                subjectsAdapter.notifyDataSetChanged();
+                            }
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
                         loading.setVisibility(View.GONE);
-                        int failureStatus = error.getResponse().getStatus();
-                        if (failureStatus == 202) {
+                        GlobalFunctions.EnableLayout(container);
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
                             Snackbar.make(loading, getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            GlobalFunctions.generalErrorMessage(loading, activity);
                         }
                     }
                 });
@@ -357,26 +484,35 @@ public class AddQuestionFragment extends Fragment {
                     loadImages(value.fileUrl, imgAttach);
                     imageUrl = value.fileUrl;
                 } else if (value.fileType.equals("v")) {
-                    loadImages(value.fileUrl, videoAttach);
                     videoUrl = value.fileUrl;
+                    loadImages(value.videoFrameUrl, videoAttach);
                 }
             }
         }
-        if (imgAttach.getDrawable().getConstantState() == getResources().getDrawable(R.mipmap.placeholder_attach).getConstantState()) {
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            imgAttach.setVisibility(View.GONE);
             deleteImgAttach.setVisibility(View.GONE);
-        }
-        else{
+        } else {
+            imgAttach.setVisibility(View.VISIBLE);
             deleteImgAttach.setVisibility(View.VISIBLE);
         }
-        if (videoAttach.getDrawable().getConstantState() == getResources().getDrawable(R.mipmap.placeholder_attach).getConstantState()) {
+        if (videoUrl == null || videoUrl.isEmpty()) {
+            videoAttach.setVisibility(View.GONE);
+            play.setVisibility(View.GONE);
             deleteVideoAttach.setVisibility(View.GONE);
-        }
-        else{
+        } else {
+            videoAttach.setVisibility(View.VISIBLE);
+            play.setVisibility(View.VISIBLE);
             deleteVideoAttach.setVisibility(View.VISIBLE);
         }
     }
 
     private void loadImages(String url, ImageView image) {
+        int Width = FixControl.getImageWidth(activity, R.mipmap.placeholder_attach);
+        int Height = FixControl.getImageHeight(activity, R.mipmap.placeholder_attach);
+        image.getLayoutParams().height = Height;
+        image.getLayoutParams().width = Width;
+
         Glide.with(activity)
                 .load(url)
                 .apply(new RequestOptions().placeholder(R.mipmap.placeholder_attach)
@@ -386,14 +522,17 @@ public class AddQuestionFragment extends Fragment {
 
     private void addQuestionApi(int subjectId, String description) {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().addQuestion(
                 sessionManager.getUserToken(), subjectId, sessionManager.getUserId(), description,
                 imageTypedFile, videoTypedFile, new Callback<ArrayList<Question>>() {
                     @Override
                     public void success(ArrayList<Question> question, Response response) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
+                            getFragmentManager().popBackStack();
                             Navigator.loadFragment(activity, HomeFragment.newInstance(activity), R.id.activity_main_fl_container, false);
                             Snackbar.make(loading, getString(R.string.questionAdded), Snackbar.LENGTH_SHORT).show();
                         }
@@ -402,9 +541,11 @@ public class AddQuestionFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         loading.setVisibility(View.GONE);
-                        int failureStatus = error.getResponse().getStatus();
-                        if (failureStatus == 201) {
+                        GlobalFunctions.EnableLayout(container);
+                        if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
                             Snackbar.make(loading, getString(R.string.noBalance), Snackbar.LENGTH_SHORT).show();
+                        } else {
+                            GlobalFunctions.generalErrorMessage(loading, activity);
                         }
                     }
                 }
@@ -413,6 +554,7 @@ public class AddQuestionFragment extends Fragment {
 
     private void updateQuestionApi(int questionId, int subjectId, int userId, String Description) {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().updateQuestion(
                 sessionManager.getUserToken(),
                 questionId,
@@ -423,17 +565,18 @@ public class AddQuestionFragment extends Fragment {
                     @Override
                     public void success(Response response, Response response2) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         int status = response2.getStatus();
                         if (status == 200) {
                             Snackbar.make(loading, getString(R.string.updateSuccess), Snackbar.LENGTH_SHORT).show();
-                            GlobalFunctions.clearLastStack(activity);
-                            Navigator.loadFragment(activity, QuestionDetailsFragment.newInstance(activity, question.id), R.id.activity_main_fl_container, false);
+                            getFragmentManager().popBackStack();
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-
+                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        GlobalFunctions.EnableLayout(container);
                     }
                 }
         );
@@ -441,12 +584,14 @@ public class AddQuestionFragment extends Fragment {
 
     private void deleteAttachmentApi(int requestAttachmentId, final String type) {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().deleteAttachment(
                 sessionManager.getUserToken(), requestAttachmentId,
                 new Callback<Response>() {
                     @Override
                     public void success(Response response, Response response2) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         int status = response2.getStatus();
                         if (status == 200) {
                             if (type.equals("image")) {
@@ -461,9 +606,11 @@ public class AddQuestionFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-
+                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        GlobalFunctions.EnableLayout(container);
                     }
                 }
         );
     }
+
 }

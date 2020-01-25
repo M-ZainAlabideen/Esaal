@@ -15,8 +15,8 @@
         android:layout_marginTop="8dp"
         android:text="علوم"
         android:textColor="@color/black"
-        app:layout_constraintStart_toStartOf="@+id/imageView5"
-        app:layout_constraintTop_toBottomOf="@+id/imageView5" />
+        app:layout_constraintStart_toStartOf="@+id/item_question_iv_avatar"
+        app:layout_constraintTop_toBottomOf="@+id/item_question_iv_avatar" />
 
     <TextView
         android:id="@+id/item_question_tv_questionText"
@@ -42,7 +42,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/imageView5"
+        android:id="@+id/item_question_iv_avatar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -58,9 +58,9 @@
         android:layout_marginStart="8dp"
         android:text="@string/esaalStudent"
         android:textColor="@color/colorPrimaryDark"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView5"
-        app:layout_constraintStart_toEndOf="@+id/imageView5"
-        app:layout_constraintTop_toTopOf="@+id/imageView5" />
+        app:layout_constraintBottom_toBottomOf="@+id/item_question_iv_avatar"
+        app:layout_constraintStart_toEndOf="@+id/item_question_iv_avatar"
+        app:layout_constraintTop_toTopOf="@+id/item_question_iv_avatar" />
 
     <TextView
         android:id="@+id/item_question_tv_date"

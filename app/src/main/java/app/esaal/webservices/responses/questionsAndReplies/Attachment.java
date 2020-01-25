@@ -2,7 +2,9 @@ package app.esaal.webservices.responses.questionsAndReplies;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Attachment {
+import java.io.Serializable;
+
+public class Attachment implements Serializable {
     @SerializedName("id")
     public int id;
 
@@ -11,4 +13,7 @@ public class Attachment {
 
     @SerializedName("fileType")
     public String fileType;
+
+    @SerializedName("filePlaceholderUrl")
+    public String videoFrameUrl;
 }

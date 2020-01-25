@@ -72,4 +72,8 @@ public class User {
     @SerializedName("isRequest")
     @Expose
     public boolean isRequest;
+
+    @SerializedName("isActive")
+    @Expose
+    public boolean isActive;
 }

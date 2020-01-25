@@ -20,11 +20,17 @@ public class Subject implements Serializable {
     @Expose
     private String englishName;
 
-    public String getName(){
-        if(MainActivity.isEnglish)
+    public String getName() {
+        if (MainActivity.isEnglish)
             return englishName;
         else
             return arabicName;
     }
 
+    public void setName(String name) {
+        if (MainActivity.isEnglish)
+            englishName = name;
+        else
+            arabicName = name;
+    }
 }

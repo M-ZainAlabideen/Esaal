@@ -3,9 +3,10 @@ package app.esaal.webservices.responses.questionsAndReplies;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Reply {
+public class Reply implements Serializable {
     @SerializedName("id")
     @Expose
     public int id;

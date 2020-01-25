@@ -6,6 +6,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <!--remove White screen is displayed while switching between Activities-->
+        <item name="android:windowDisablePreview">true</item>
     </style>
 
     <style name="SearchViewTheme" parent="Widget.AppCompat.Light.SearchView">

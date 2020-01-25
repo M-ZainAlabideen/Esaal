@@ -3,6 +3,7 @@ package app.esaal.adapters;
 import android.content.Context;
 import android.support.annotation.BinderThread;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,17 +19,21 @@ import com.bumptech.glide.request.RequestOptions;
 import java.util.ArrayList;
 
 import app.esaal.R;
+import app.esaal.classes.FixControl;
 import app.esaal.classes.SessionManager;
 import app.esaal.webservices.responses.questionsAndReplies.Attachment;
 import app.esaal.webservices.responses.questionsAndReplies.Reply;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+/*
+ * the adapter of replies items of each question*/
 public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.viewHolder> {
     Context context;
     ArrayList<Reply> repliesList;
     SessionManager sessionManager;
     OnItemClickListener listener;
+    //variables for saving image and video Url  of each item
     String imageUrl;
     String videoUrl;
 
@@ -55,6 +60,8 @@ public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.viewHold
         TextView replyWord;
         @BindView(R.id.item_reply_iv_imgAttach)
         ImageView imgAttach;
+        @BindView(R.id.item_reply_cl_videoContainer)
+        ConstraintLayout videoContainer;
         @BindView(R.id.item_reply_iv_videoAttach)
         ImageView videoAttach;
         @BindView(R.id.item_reply_iv_play)
@@ -63,6 +70,8 @@ public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.viewHold
         ImageView like;
         @BindView(R.id.item_reply_iv_dislike)
         ImageView dislike;
+        @BindView(R.id.item_reply_v_separatedLine)
+        View separatedLine;
         @BindView(R.id.item_reply_pb_loading)
         ProgressBar loading;
 
@@ -82,13 +91,21 @@ public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.viewHold
 
     @Override
     public void onBindViewHolder(@NonNull final RepliesAdapter.viewHolder viewHolder, final int position) {
+        //each reply (item) has loading(ProgressBar)
         viewHolder.loading.setVisibility(View.GONE);
+
+        //in case of the userId equal the userId of reply >> the user can not reply fo himself
         if (sessionManager.getUserId() == repliesList.get(position).userId) {
             viewHolder.replyImg.setVisibility(View.GONE);
             viewHolder.replyWord.setVisibility(View.GONE);
         }
 
+        if (position == repliesList.size() - 1) {
+            viewHolder.separatedLine.setVisibility(View.GONE);
+        }
         viewHolder.replyText.setText(repliesList.get(position).replyMessage);
+
+
         if ((repliesList.get(position).userId == sessionManager.getUserId() && sessionManager.isTeacher()) ||
                 (repliesList.get(position).userId != sessionManager.getUserId() && !sessionManager.isTeacher())) {
             viewHolder.title.setText(context.getString(R.string.esaalTeacher));
@@ -122,25 +139,23 @@ public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.viewHold
                     loadImages(value.fileUrl, viewHolder.imgAttach);
                     imageUrl = value.fileUrl;
                 } else if (value.fileType.equals("v")) {
-                    loadImages(value.fileUrl, viewHolder.videoAttach);
+                    loadImages(value.videoFrameUrl, viewHolder.videoAttach);
                     videoUrl = value.fileUrl;
                 }
             }
         }
 
-        if(repliesList.get(position).attachments == null || repliesList.get(position).attachments.isEmpty()){
-            viewHolder.imgAttach.setVisibility(View.INVISIBLE);
-            viewHolder.videoAttach.setVisibility(View.INVISIBLE);
-            viewHolder.play.setVisibility(View.INVISIBLE);
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            viewHolder.imgAttach.setVisibility(View.GONE);
+        }
+        if (videoUrl == null || videoUrl.isEmpty()) {
+            viewHolder.videoContainer.setVisibility(View.GONE);
         }
 
-            if (imageUrl == null || imageUrl.isEmpty()) {
-                viewHolder.imgAttach.setVisibility(View.INVISIBLE);
-            }
-            if (videoUrl == null || videoUrl.isEmpty()) {
-                viewHolder.videoAttach.setVisibility(View.INVISIBLE);
-                viewHolder.play.setVisibility(View.INVISIBLE);
-            }
+        //reset imageUrl value and videoUrl value
+        imageUrl = null;
+        videoUrl = null;
+
         viewHolder.reply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -168,11 +183,7 @@ public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.viewHold
                 for (Attachment value : repliesList.get(position).attachments) {
                     if (value.fileUrl != null && !value.fileUrl.isEmpty()) {
                         if (value.fileType.equals("i")) {
-                            loadImages(value.fileUrl, viewHolder.imgAttach);
                             imageUrl = value.fileUrl;
-                        } else if (value.fileType.equals("v")) {
-                            loadImages(value.fileUrl, viewHolder.videoAttach);
-                            videoUrl = value.fileUrl;
                         }
                     }
                 }
@@ -187,11 +198,7 @@ public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.viewHold
             public void onClick(View v) {
                 for (Attachment value : repliesList.get(position).attachments) {
                     if (value.fileUrl != null && !value.fileUrl.isEmpty()) {
-                        if (value.fileType.equals("i")) {
-                            loadImages(value.fileUrl, viewHolder.imgAttach);
-                            imageUrl = value.fileUrl;
-                        } else if (value.fileType.equals("v")) {
-                            loadImages(value.fileUrl, viewHolder.videoAttach);
+                        if (value.fileType.equals("v")) {
                             videoUrl = value.fileUrl;
                         }
                     }
@@ -199,15 +206,23 @@ public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.viewHold
                 listener.videoAttach(position, videoUrl);
             }
         });
+
+
     }
 
     private void loadImages(String url, ImageView image) {
+        int Width = FixControl.getImageWidth(context, R.mipmap.placeholder_attach);
+        int Height = FixControl.getImageHeight(context, R.mipmap.placeholder_attach);
+        image.getLayoutParams().height = Height;
+        image.getLayoutParams().width = Width;
+
         Glide.with(context)
                 .load(url)
                 .apply(new RequestOptions().placeholder(R.mipmap.placeholder_attach)
                         .error(R.mipmap.placeholder_attach))
                 .into(image);
     }
+
 
     @Override
     public int getItemCount() {
@@ -222,7 +237,7 @@ public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.viewHold
 
         void dislikeClick(int position, ImageView likeImg, ImageView dislikeImg, ProgressBar loading);
 
-        void imgAttach(int position,ArrayList<String> images);
+        void imgAttach(int position, ArrayList<String> images);
 
         void videoAttach(int position, String url);
     }

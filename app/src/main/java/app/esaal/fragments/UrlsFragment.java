@@ -7,9 +7,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
@@ -30,13 +33,13 @@ public class UrlsFragment extends Fragment {
     WebView urls_webView;
 
     //pass the Url as parameter when fragment is loaded for loading Url content
-    public static UrlsFragment newInstance(FragmentActivity activity, String Url) {
+    public static UrlsFragment newInstance(FragmentActivity activity, String Url, String flag) {
         fragment = new UrlsFragment();
+        Bundle b = new Bundle();
+        b.putString("flag", flag);
+        fragment.setArguments(b);
         UrlsFragment.activity = activity;
-        if (Url.contains("http"))
             fragment.Url = Url;
-        else
-            fragment.Url = "https://" + Url;
         return fragment;
     }
 
@@ -56,10 +59,23 @@ public class UrlsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        MainActivity.appbar.setVisibility(View.VISIBLE);
-        MainActivity.bottomAppbar.setVisibility(View.VISIBLE);
+        if (getArguments().getString("flag").equals("video")) {
+            MainActivity.appbar.setVisibility(View.GONE);
+            MainActivity.bottomAppbar.setVisibility(View.GONE);
+        } else {
+            MainActivity.appbar.setVisibility(View.VISIBLE);
+            MainActivity.bottomAppbar.setVisibility(View.VISIBLE);
+        }
         //WebView should execute JavaScript
         urls_webView.getSettings().setJavaScriptEnabled(true);
+
+        //for video playing
+        urls_webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+        urls_webView.getSettings().setPluginState(WebSettings.PluginState.ON);
+        urls_webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
+        urls_webView.setWebChromeClient(new WebChromeClient());
+
+
         /*when enabling this Property is that it would then allow ANY website
         that takes advantage of DOM storage to use said storage options on the device*/
         urls_webView.getSettings().setDomStorageEnabled(true);

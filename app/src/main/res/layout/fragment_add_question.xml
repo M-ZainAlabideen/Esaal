@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -107,51 +107,83 @@
 
     <TextView
         android:id="@+id/fragment_add_question_tv_addVideoWord"
+        style="@style/TextAppearance.AppCompat.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/addVideo"
         android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:text="@string/addVideo"
         android:textColor="@color/gray"
-        style="@style/TextAppearance.AppCompat.Small"
         app:layout_constraintEnd_toEndOf="@+id/fragment_add_question_iv_captureVideo"
         app:layout_constraintStart_toStartOf="@+id/fragment_add_question_iv_captureVideo"
         app:layout_constraintTop_toBottomOf="@+id/fragment_add_question_iv_captureVideo" />
 
 
-    <ImageView
-        android:id="@+id/fragment_add_question_iv_imgAttach"
+    <LinearLayout
+        android:id="@+id/fragment_add_question_ll_questionAttachContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:scaleType="centerCrop"
-        app:layout_constraintEnd_toEndOf="@+id/fragment_add_question_tv_addImgWord"
-        app:layout_constraintStart_toStartOf="@+id/fragment_add_question_tv_addImgWord"
-        app:layout_constraintTop_toBottomOf="@+id/fragment_add_question_tv_addImgWord"
-        app:srcCompat="@mipmap/placeholder_attach" />
-
-
-    <ImageView
-        android:id="@+id/fragment_add_question_iv_videoAttach"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:scaleType="centerCrop"
-        android:layout_marginTop="20dp"
-        app:layout_constraintEnd_toEndOf="@+id/fragment_add_question_tv_addVideoWord"
-        app:layout_constraintStart_toStartOf="@+id/fragment_add_question_tv_addVideoWord"
-        app:layout_constraintTop_toBottomOf="@+id/fragment_add_question_tv_addVideoWord"
-        app:srcCompat="@mipmap/placeholder_attach" />
-
-    <ImageView
-        android:id="@+id/fragment_add_question_iv_play"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="@+id/fragment_add_question_iv_videoAttach"
-        app:layout_constraintEnd_toEndOf="@+id/fragment_add_question_iv_videoAttach"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/fragment_add_question_iv_videoAttach"
-        app:layout_constraintTop_toTopOf="@+id/fragment_add_question_iv_videoAttach"
-        app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@mipmap/play" />
+        app:layout_constraintStart_toStartOf="@+id/fragment_add_question_iv_captureImg"
+        app:layout_constraintTop_toBottomOf="@+id/textView2">
+
+        <ImageView
+            android:id="@+id/fragment_add_question_iv_imgAttach"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="40dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:srcCompat="@mipmap/placeholder_attach" />
+
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/fragment_add_reply_cl_videoContainer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/fragment_add_question_iv_videoAttach"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="centerCrop"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@mipmap/placeholder_attach" />
+
+
+            <ImageView
+                android:id="@+id/fragment_add_question_iv_play"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="@+id/fragment_add_reply_iv_questionVideoAttach"
+                app:layout_constraintEnd_toEndOf="@+id/fragment_add_reply_iv_questionVideoAttach"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="@+id/fragment_add_reply_iv_questionVideoAttach"
+                app:layout_constraintTop_toTopOf="@+id/fragment_add_reply_iv_questionVideoAttach"
+                app:layout_constraintVertical_bias="1.0"
+                app:srcCompat="@mipmap/play" />
+
+            <ImageView
+                android:id="@+id/fragment_add_question_iv_deleteVideoAttach"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="3dp"
+                app:layout_constraintStart_toStartOf="@+id/fragment_add_question_iv_videoAttach"
+                app:layout_constraintTop_toTopOf="@+id/fragment_add_question_iv_videoAttach"
+                app:srcCompat="@mipmap/ic_delete" />
+
+        </android.support.constraint.ConstraintLayout>
+
+
+    </LinearLayout>
+
 
     <!--<LinearLayout-->
         <!--android:id="@+id/editText9"-->
@@ -192,7 +224,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fragment_add_question_iv_imgAttach"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_add_question_ll_questionAttachContainer"
         app:layout_constraintVertical_bias="0.0" />
 
     <ImageView
@@ -200,18 +232,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="3dp"
-        app:layout_constraintStart_toStartOf="@+id/fragment_add_question_iv_imgAttach"
-        app:layout_constraintTop_toTopOf="@+id/fragment_add_question_iv_imgAttach"
+        app:layout_constraintStart_toStartOf="@+id/fragment_add_question_ll_questionAttachContainer"
+        app:layout_constraintTop_toTopOf="@+id/fragment_add_question_ll_questionAttachContainer"
         app:srcCompat="@mipmap/ic_delete" />
 
-    <ImageView
-        android:id="@+id/fragment_add_question_iv_deleteVideoAttach"
+    <TextView
+        android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="3dp"
-        app:layout_constraintStart_toStartOf="@+id/fragment_add_question_iv_videoAttach"
-        app:layout_constraintTop_toTopOf="@+id/fragment_add_question_iv_videoAttach"
-        app:srcCompat="@mipmap/ic_delete" />
+        android:text="@string/videoDuration"
+        android:textColor="@color/colorAccent"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@+id/fragment_add_question_tv_addImgWord"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_add_question_tv_addImgWord" />
+
 </android.support.constraint.ConstraintLayout>
     <ProgressBar
         android:id="@+id/loading"
@@ -229,4 +263,4 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
-</android.support.v4.widget.NestedScrollView>
+</ScrollView>

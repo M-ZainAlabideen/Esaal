@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -90,11 +91,14 @@ public class PayUrlFragment extends Fragment {
             webView.loadUrl(payUrl);
 
             webView.setWebViewClient(new WebViewClient() {
+                @Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
                     if (url.contains(Constants.SUCCESS_PAGE)) {
-                        GlobalFunctions.clearLastStack(activity);
+                        //fix  it
+                        getFragmentManager().popBackStack();
+                       // GlobalFunctions.clearStack(activity);
                         if (comingFrom.equals("addPackage")) {
-                            GlobalFunctions.clearLastStack(activity);
+                           // GlobalFunctions.clearStack(activity);
                                 Snackbar.make(loading, getString(R.string.subscriptionSuccessfully), Snackbar.LENGTH_SHORT).show();
                                 Navigator.loadFragment(activity, MyAccountFragment.newInstance(activity), R.id.activity_main_fl_container, false);
                             } else {
@@ -123,6 +127,7 @@ public class PayUrlFragment extends Fragment {
 
                 }
 
+                @Override
                 public void onPageFinished(WebView view, String url) {
                     // hide progress of Loading after finishing
                     loading.setVisibility(View.GONE);

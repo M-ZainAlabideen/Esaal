@@ -25,6 +25,9 @@ public class Payment {
     @Expose
     public PaymentPackage paymentPackage;
 
+    @SerializedName("remainQuestionNumber")
+    @Expose
+    public int remainQuestionNumber;
 
     public String getPaymentDate() {
         return GlobalFunctions.formatDate(paymentDate);

@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,8 +46,11 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         TextView subjectName;
         @BindView(R.id.item_notification_tv_title)
         TextView title;
+        @BindView(R.id.item_notification_tv_description)
+        TextView description;
         @BindView(R.id.item_notification_v_details)
         View details;
+
 
         public viewHolder(@NonNull View itemView) {
             super(itemView);
@@ -64,31 +69,46 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     @Override
     public void onBindViewHolder(@NonNull NotificationsAdapter.viewHolder viewHolder, final int position) {
 
-        if(!notificationsList.get(position).isRead){
+        if (!notificationsList.get(position).isRead) {
             viewHolder.indicator.setImageResource(R.mipmap.ic_notifi_circle_blue);
         }
-        viewHolder.subjectName.setText(notificationsList.get(position).getSubjectName());
-        if (notificationsList.get(position).getMessage().length() > 25)
-            viewHolder.title.setText(notificationsList.get(position).getMessage().substring(0, 25) + "...");
-        else
-            viewHolder.title.setText(notificationsList.get(position).getMessage());
 
+        viewHolder.title.setText(notificationsList.get(position).getMessage());
         viewHolder.date.setText(notificationsList.get(position).getNotificationDate());
+
+
+        if (notificationsList.get(position).getSubjectName() != null && !notificationsList.get(position).getSubjectName().isEmpty()) {
+            viewHolder.subjectName.setVisibility(View.VISIBLE);
+            viewHolder.subjectName.setText(notificationsList.get(position).getSubjectName());
+        } else {
+            viewHolder.subjectName.setVisibility(View.GONE);
+        }
+        if (notificationsList.get(position).questionDescription != null && !notificationsList.get(position).questionDescription.isEmpty()) {
+            viewHolder.description.setVisibility(View.VISIBLE);
+            viewHolder.description.setText(notificationsList.get(position).questionDescription);
+        } else {
+            viewHolder.description.setVisibility(View.GONE);
+        }
 
         viewHolder.details.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(notificationsList.get(position).requestQuestionId == 0);
-                else{
-                    Navigator.loadFragment((FragmentActivity) context, QuestionDetailsFragment.newInstance((FragmentActivity) context,notificationsList.get(position).requestQuestionId), R.id.activity_main_fl_container, true);
+                if (notificationsList.get(position).requestQuestionId == 0) ;
+                else {
+                    Navigator.loadFragment((FragmentActivity) context, QuestionDetailsFragment.newInstance((FragmentActivity) context, notificationsList.get(position).requestQuestionId), R.id.activity_main_fl_container, true);
                 }
             }
         });
 
-         if (MainActivity.isEnglish)  {
+        if (MainActivity.isEnglish) {
+            Typeface enBold = Typeface.createFromAsset(context.getAssets(), "montserrat_medium.ttf");
+            viewHolder.subjectName.setTypeface(enBold);
             Typeface cairo = Typeface.createFromAsset(context.getAssets(), "cairo_regular.ttf");
             viewHolder.title.setTypeface(cairo);
             viewHolder.date.setTypeface(cairo);
+        } else {
+            Typeface arBold = Typeface.createFromAsset(context.getAssets(), "cairo_bold.ttf");
+            viewHolder.subjectName.setTypeface(arBold);
         }
     }
 
@@ -97,7 +117,3 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         return notificationsList.size();
     }
 }
-
-
-
-

@@ -46,6 +46,8 @@ public class PaymentsAdapter extends RecyclerView.Adapter<PaymentsAdapter.viewHo
         TextView formWord;
         @BindView(R.id.item_payment_tv_toWord)
         TextView toWord;
+        @BindView(R.id.item_payment_tv_remainsQuestions)
+        TextView remainsQuestions;
 
         public viewHolder(@NonNull View itemView) {
             super(itemView);
@@ -67,6 +69,13 @@ public class PaymentsAdapter extends RecyclerView.Adapter<PaymentsAdapter.viewHo
         viewHolder.date.setText(paymentsList.get(position).getCreationDate());
         viewHolder.fromDate.setText(paymentsList.get(position).getPaymentDate());
         viewHolder.toDate.setText(paymentsList.get(position).getEndDate());
+        String questionWord = "";
+        if (paymentsList.get(position).remainQuestionNumber <= 10)
+            questionWord = context.getString(R.string.questions);
+        else
+            questionWord = context.getString(R.string.question);
+        viewHolder.remainsQuestions.setText(context.getString(R.string.remainsQuestions)+": "+
+                paymentsList.get(position).remainQuestionNumber + " "+ questionWord);
 
         if (MainActivity.isEnglish) {
             Typeface enBold = Typeface.createFromAsset(context.getAssets(), "montserrat_medium.ttf");

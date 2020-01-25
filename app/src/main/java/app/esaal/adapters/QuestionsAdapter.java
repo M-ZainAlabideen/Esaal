@@ -1,10 +1,10 @@
 package app.esaal.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,10 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import app.esaal.MainActivity;
 import app.esaal.R;
@@ -41,6 +39,8 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.view
 
         @BindView(R.id.item_question_cl_container)
         ConstraintLayout container;
+        @BindView(R.id.item_question_iv_avatar)
+        ImageView avatar;
         @BindView(R.id.item_question_tv_subjectName)
         TextView subjectName;
         @BindView(R.id.item_question_tv_questionText)
@@ -83,14 +83,26 @@ public class QuestionsAdapter extends RecyclerView.Adapter<QuestionsAdapter.view
         else
             viewHolder.questionText.setText(questionsList.get(position).description);
 
-        if(questionsList.get(position).isPending && (questionsList.get(position).pendingUserId == sessionManager.getUserId())){
+        if (questionsList.get(position).isPending && (questionsList.get(position).pendingUserId == sessionManager.getUserId())) {
             viewHolder.container.setBackground(context.getDrawable(R.mipmap.box_reservation_question));
+            viewHolder.date.setTextColor(Color.parseColor("#ffffff"));
+            viewHolder.esaalStudent.setTextColor(Color.parseColor("#ffffff"));
+            viewHolder.questionText.setTextColor(Color.parseColor("#ffffff"));
+            viewHolder.subjectName.setTextColor(Color.parseColor("#ffffff"));
+            viewHolder.avatar.setImageResource(R.mipmap.ic_student_white);
+        } else {
+            viewHolder.container.setBackground(context.getDrawable(R.mipmap.box_search_res));
+            viewHolder.date.setTextColor(Color.parseColor("#9E9D9D"));
+            viewHolder.esaalStudent.setTextColor(Color.parseColor("#0A68B0"));
+            viewHolder.questionText.setTextColor(Color.parseColor("#000000"));
+            viewHolder.subjectName.setTextColor(Color.parseColor("#000000"));
+            viewHolder.avatar.setImageResource(R.mipmap.ic_student);
         }
-        viewHolder.date.setText(GlobalFunctions.formatDateAndtime(questionsList.get(position).creationDate));
+        viewHolder.date.setText(GlobalFunctions.formatDateAndTime(questionsList.get(position).creationDate));
         viewHolder.details.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    Navigator.loadFragment((FragmentActivity) context, QuestionDetailsFragment.newInstance((FragmentActivity) context, questionsList.get(position).id), R.id.activity_main_fl_container, true);
+                Navigator.loadFragment((FragmentActivity) context, QuestionDetailsFragment.newInstance((FragmentActivity) context, questionsList.get(position).id), R.id.activity_main_fl_container, true);
             }
         });
 

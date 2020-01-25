@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import app.esaal.classes.GlobalFunctions;
 import app.esaal.classes.SessionManager;
@@ -38,9 +39,12 @@ public class AboutUsFragment extends Fragment {
     @BindView(R.id.loading)
     ProgressBar loading;
 
-    public static AboutUsFragment newInstance(FragmentActivity activity) {
+    public static AboutUsFragment newInstance(FragmentActivity activity, boolean isTerms) {
         fragment = new AboutUsFragment();
         AboutUsFragment.activity = activity;
+        Bundle b = new Bundle();
+        b.putBoolean("isTerms", isTerms);
+        fragment.setArguments(b);
         return fragment;
     }
 
@@ -55,15 +59,21 @@ public class AboutUsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        MainActivity.setupAppbar(true, true, false, false, "more", getString(R.string.aboutUs));
+        String title = "";
+        if (fragment.getArguments().getBoolean("isTerms")) {
+            title = getString(R.string.terms);
+        } else {
+            title = getString(R.string.aboutUs);
+        }
+        MainActivity.setupAppbar(true, true, false, false, "more", title);
         content.setVisibility(View.GONE);
         sessionManager = new SessionManager(activity);
+        GlobalFunctions.hasNewNotificationsApi(activity);
         aboutUs();
     }
 
     private void aboutUs() {
         EsaalApiConfig.getCallingAPIInterface().aboutUs(
-                sessionManager.getUserToken(),
                 new Callback<AboutUsResponse>() {
                     @Override
                     public void success(AboutUsResponse aboutUsResponse, Response response) {
@@ -71,33 +81,42 @@ public class AboutUsFragment extends Fragment {
                         content.setVisibility(View.VISIBLE);
                         int status = response.getStatus();
                         if (status == 200) {
-                            setupWebView(aboutUsResponse.getAboutUs());
+                            if (fragment.getArguments().getBoolean("isTerms")) {
+                                if (sessionManager.isTeacher()) {
+                                    setupWebView(aboutUsResponse.getTeacherTermsCondition());
+                                } else {
+                                    setupWebView(aboutUsResponse.getStudentTermsCondition());
+                                }
+                            } else {
+                                setupWebView(aboutUsResponse.getAboutUs());
+                            }
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                        GlobalFunctions.generalErrorMessage(loading,activity);
+                        GlobalFunctions.generalErrorMessage(loading, activity);
                     }
                 }
         );
     }
 
     private void setupWebView(String contentStr) {
-        contentStr = contentStr.replace("font", "f");
-        contentStr = contentStr.replace("color", "c");
-        contentStr = contentStr.replace("size", "s");
-        String fontName;
-        if (MainActivity.isEnglish)
-            fontName = "montserrat_regular.ttf";
-        else
-            fontName = "cairo_regular.ttf";
+        if (contentStr != null) {
+            contentStr = contentStr.replace("font", "f");
+            contentStr = contentStr.replace("color", "c");
+            contentStr = contentStr.replace("size", "s");
+            String fontName;
+            if (MainActivity.isEnglish)
+                fontName = "montserrat_regular.ttf";
+            else
+                fontName = "cairo_regular.ttf";
 
-        String head = "<head><style>@font-face {font-family: 'verdana';src: url('file:///android_asset/" + fontName + "');}body {font-family: 'verdana';}</style></head>";
-        String htmlData = "<html>" + head + (MainActivity.isEnglish ? "<body dir=\"ltr\"" : "<body dir=\"rtl\"") + " style=\"font-family: verdana\">" +
-                contentStr + "</body></html>";
-        content.loadDataWithBaseURL("", htmlData, "text/html; charset=utf-8", "utf-8", "");
-
+            String head = "<head><style>@font-face {font-family: 'verdana';src: url('file:///android_asset/" + fontName + "');}body {font-family: 'verdana';}</style></head>";
+            String htmlData = "<html>" + head + (MainActivity.isEnglish ? "<body dir=\"ltr\"" : "<body dir=\"rtl\"") + " style=\"font-family: verdana\">" +
+                    contentStr + "</body></html>";
+            content.loadDataWithBaseURL("", htmlData, "text/html; charset=utf-8", "utf-8", "");
+        }
     }
 
 }

@@ -3,6 +3,7 @@ package app.esaal.fragments;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -38,6 +39,9 @@ public class PackagesFragment extends Fragment {
     private PackagesAdapter packagesAdapter;
     private ArrayList<Package> packagesList = new ArrayList<>();
     private String comingFrom;
+
+    @BindView(R.id.fragment_packages_cl_container)
+    ConstraintLayout container;
     @BindView(R.id.fragment_packages_rv_packages)
     RecyclerView packages;
     @BindView(R.id.loading)
@@ -115,6 +119,7 @@ public class PackagesFragment extends Fragment {
 
     private void selectPackageApi(int subscriptionId) {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().selectPackage(
                 sessionManager.getUserToken(),
                 sessionManager.getUserId(),
@@ -123,6 +128,8 @@ public class PackagesFragment extends Fragment {
                     @Override
                     public void success(SelectPackageResponse selectPackageResponse, Response response) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
+
                         int status = response.getStatus();
                         if (status == 200) {
                             if(selectPackageResponse.returnUrl != null && !selectPackageResponse.returnUrl.isEmpty()){
@@ -133,6 +140,7 @@ public class PackagesFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
+                        GlobalFunctions.EnableLayout(container);
                         GlobalFunctions.generalErrorMessage(loading, activity);
                     }
                 }

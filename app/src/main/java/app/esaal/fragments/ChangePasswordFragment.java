@@ -65,6 +65,8 @@ public class ChangePasswordFragment extends Fragment {
         loading.setVisibility(View.GONE);
         FixControl.setupUI(container, activity);
         sessionManager = new SessionManager(activity);
+        GlobalFunctions.hasNewNotificationsApi(activity);
+
     }
 
 
@@ -94,6 +96,7 @@ public class ChangePasswordFragment extends Fragment {
 
     private void changePasswordApi(ChangePasswordRequest changePasswordRequest) {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().changePassword(
                 sessionManager.getUserToken(),
                 changePasswordRequest,
@@ -101,11 +104,15 @@ public class ChangePasswordFragment extends Fragment {
                     @Override
                     public void success(Response response, Response response2) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         int status = response2.getStatus();
                         if (status == 200) {
                             Snackbar.make(loading, getString(R.string.passwordChanged), Snackbar.LENGTH_SHORT).show();
-                            GlobalFunctions.clearLastStack(activity);
-                            Navigator.loadFragment(activity, MoreFragment.newInstance(activity), R.id.activity_main_fl_container, false);
+                            //fix it
+                            getFragmentManager().popBackStack();
+                            //activity.onBackPressed();
+                            //GlobalFunctions.clearStack(activity);
+                            //Navigator.loadFragment(activity, MoreFragment.newInstance(activity), R.id.activity_main_fl_container, false);
                         }
                         else if (status == 202) {
                             loading.setVisibility(View.GONE);
@@ -115,7 +122,8 @@ public class ChangePasswordFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-
+                        GlobalFunctions.EnableLayout(container);
+                        GlobalFunctions.generalErrorMessage(loading,activity);
                     }
                 });
     }

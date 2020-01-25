@@ -25,9 +25,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class SubjectsAdapter extends RecyclerView.Adapter<SubjectsAdapter.viewHolder> {
-    Context context;
-    ArrayList<Subject> subjectsList;
-    SessionManager sessionManager;
+    private Context context;
+    private ArrayList<Subject> subjectsList;
     public SubjectsAdapter(Context context, ArrayList<Subject> subjectsList) {
         this.context = context;
         this.subjectsList = subjectsList;
@@ -45,7 +44,6 @@ public class SubjectsAdapter extends RecyclerView.Adapter<SubjectsAdapter.viewHo
 
         public viewHolder(@NonNull View itemView) {
             super(itemView);
-            sessionManager = new SessionManager(context);
             ButterKnife.bind(this, itemView);
         }
     }
@@ -95,7 +93,6 @@ public class SubjectsAdapter extends RecyclerView.Adapter<SubjectsAdapter.viewHo
     public int getItemCount() {
         return subjectsList.size();
     }
-
 
 }
 

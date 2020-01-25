@@ -1,14 +1,12 @@
 package app.esaal.adapters;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -24,7 +22,7 @@ public class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.viewHolder
     Context context;
     ArrayList<Subject> subjectsList;
     ArrayList<Country> countriesList;
-    public static int selectedPosition;
+    public static ArrayList<Integer> subjectsSelectedIds = new ArrayList<>();
 
     public FilterAdapter(Context context, ArrayList<Subject> subjectsList, ArrayList<Country> countriesList) {
         this.context = context;
@@ -54,17 +52,24 @@ public class FilterAdapter extends RecyclerView.Adapter<FilterAdapter.viewHolder
     @Override
     public void onBindViewHolder(@NonNull final FilterAdapter.viewHolder viewHolder, int position) {
         if (subjectsList != null) {
+            viewHolder.subjectBg.setBackground(context.getResources().getDrawable(R.mipmap.box_filter_subject_unsel));
             String name = subjectsList.get(position).getName();
             if (name.length() > 8)
                 viewHolder.subjectName.setText(name.substring(0, 7));
             else
                 viewHolder.subjectName.setText(name);
-            if (selectedPosition != -1) {
-                if (position == selectedPosition)
-                    viewHolder.subjectBg.setBackground(context.getResources().getDrawable(R.mipmap.box_filter_subject_sel));
+            if (subjectsSelectedIds.size() != 0) {
+                for (Integer item : subjectsSelectedIds) {
+                    if (subjectsList.get(position).id == item)
+                        viewHolder.subjectBg.setBackground(context.getResources().getDrawable(R.mipmap.box_filter_subject_sel));
+                }
             }
         } else if (countriesList != null) {
-            viewHolder.subjectName.setText(countriesList.get(position).getName());
+            String name = countriesList.get(position).getName();
+            if (name.length() > 8)
+                viewHolder.subjectName.setText(name.substring(0, 7));
+            else
+                viewHolder.subjectName.setText(name);
         }
     }
 

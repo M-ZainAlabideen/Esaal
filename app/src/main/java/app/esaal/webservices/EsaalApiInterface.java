@@ -7,7 +7,6 @@ import app.esaal.webservices.requests.LoginRequest;
 import app.esaal.webservices.requests.SendMessageRequest;
 import app.esaal.webservices.requests.StudentRequest;
 import app.esaal.webservices.requests.TeacherRequest;
-import app.esaal.webservices.requests.UpdateQuestionRequest;
 import app.esaal.webservices.responses.aboutUs.AboutUsResponse;
 import app.esaal.webservices.responses.authorization.ChangePasswordRequest;
 import app.esaal.webservices.responses.authorization.User;
@@ -23,7 +22,6 @@ import app.esaal.webservices.responses.questionsAndReplies.Reply;
 import app.esaal.webservices.responses.slider.Slider;
 import app.esaal.webservices.responses.subjects.Subject;
 import app.esaal.webservices.responses.packages.Package;
-import butterknife.BindView;
 import retrofit.Callback;
 import retrofit.client.Response;
 import retrofit.http.Body;
@@ -115,12 +113,12 @@ public interface EsaalApiInterface {
     //************************HOME****************************//
 
     @GET("/SliderPhoto")
-    void slider(@Header(Constants.AUTHORIZATION) String authorization,
-                Callback<ArrayList<Slider>> response);
+    void slider(Callback<ArrayList<Slider>> response);
 
     @GET("/GetUserNotifications")
     void notifications(@Header(Constants.AUTHORIZATION) String authorization,
                        @Query("userid") int userId,
+                       @Query("pageNum") int pageNum,
                        Callback<ArrayList<Notification>> response);
 
     @POST("/UpdateUserNotifications")
@@ -152,17 +150,14 @@ public interface EsaalApiInterface {
     //************************CONTACTS AND ABOUT-US****************************//
 
     @GET("/ContactUs")
-    void contacts(@Header(Constants.AUTHORIZATION) String authorization,
-                  Callback<ArrayList<Contact>> response);
+    void contacts(Callback<ArrayList<Contact>> response);
 
     @POST("/ContactUs")
-    void sendMessage(@Header(Constants.AUTHORIZATION) String authorization,
-                     @Body SendMessageRequest sendMessageRequest,
+    void sendMessage(@Body SendMessageRequest sendMessageRequest,
                      Callback<String> response);
 
     @GET("/AboutUs")
-    void aboutUs(@Header(Constants.AUTHORIZATION) String authorization,
-                 Callback<AboutUsResponse> response);
+    void aboutUs(Callback<AboutUsResponse> response);
 
     //************************QUESTIONS AND ANSWERS****************************//
 
@@ -195,7 +190,7 @@ public interface EsaalApiInterface {
     @GET("/GetUserQuestionsByMaterials")
     void filterResult(@Header(Constants.AUTHORIZATION) String authorization,
                       @Query("userid") int userId,
-                      @Query("materialid") int subjectId,
+                      @Query("materialid") String subjectId,
                       @Query("pageNum") int pageNum,
                       Callback<ArrayList<Question>> response);
 
@@ -253,4 +248,18 @@ public interface EsaalApiInterface {
             @Query("userid") int userId,
             Callback<Question> response
     );
+
+    @GET("/AddDevicetoken")
+    void addDeviceToken(
+            @Header(Constants.AUTHORIZATION) String authorization,
+            @Query("userid") int userId,
+            @Query("token") String token,
+            @Query("DeviceType") int DeviceType,
+            Callback<Response> response);
+
+    @POST("/logout")
+    void logout(
+            @Header(Constants.AUTHORIZATION) String authorization,
+            @Query("userid") int userId,
+            Callback<Response> response);
 }

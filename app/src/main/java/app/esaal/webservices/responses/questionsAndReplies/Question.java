@@ -11,12 +11,11 @@ import app.esaal.webservices.responses.subjects.Subject;
 
 public class Question implements Serializable {
 
-
     @SerializedName("id")
     public int id;
 
     @SerializedName("materialId")
-    public int materialId;
+    public int subjectId;
 
     @SerializedName("userId")
     public int userId;

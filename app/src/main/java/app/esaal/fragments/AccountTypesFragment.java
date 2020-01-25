@@ -46,7 +46,7 @@ public class AccountTypesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        MainActivity.setupAppbar(false,false,false,false,"","");
+        MainActivity.setupAppbar(false, false, false, false, "", "");
         sessionManager = new SessionManager(activity);
         if (MainActivity.isEnglish) {
             Typeface enBold = Typeface.createFromAsset(activity.getAssets(), "montserrat_medium.ttf");
@@ -55,20 +55,26 @@ public class AccountTypesFragment extends Fragment {
         } else {
             Typeface arBold = Typeface.createFromAsset(activity.getAssets(), "cairo_bold.ttf");
             studentWord.setTypeface(arBold);
-            teacherWord.setTypeface(arBold);}
+            teacherWord.setTypeface(arBold);
+        }
     }
 
     @OnClick(R.id.fragment_account_types_iv_student)
     public void studentClick() {
         sessionManager.setTeacher(false);
-        Navigator.loadFragment(activity, RegistrationFragment.newInstance(activity),R.id.activity_main_fl_container,true);
+        Navigator.loadFragment(activity, RegistrationFragment.newInstance(activity), R.id.activity_main_fl_container, true);
 
     }
 
     @OnClick(R.id.fragment_account_types_iv_teacher)
     public void teacherClick() {
         sessionManager.setTeacher(true);
-        Navigator.loadFragment(activity, RegistrationFragment.newInstance(activity),R.id.activity_main_fl_container,true);
+        Navigator.loadFragment(activity, RegistrationFragment.newInstance(activity), R.id.activity_main_fl_container, true);
 
+    }
+
+    @OnClick(R.id.fragment_account_types_iv_close)
+    public void closeCLick(){
+        activity.onBackPressed();
     }
 }

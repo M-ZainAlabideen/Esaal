@@ -1,12 +1,12 @@
 package app.esaal.fragments;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,27 +14,27 @@ import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.nguyenhoanglam.imagepicker.model.Config;
 import com.nguyenhoanglam.imagepicker.model.Image;
 import com.nguyenhoanglam.imagepicker.ui.imagepicker.ImagePicker;
+import com.vincent.videocompressor.VideoCompress;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import app.esaal.MainActivity;
 import app.esaal.R;
-import app.esaal.adapters.RepliesAdapter;
 import app.esaal.classes.FixControl;
 import app.esaal.classes.GlobalFunctions;
 import app.esaal.classes.Navigator;
@@ -60,8 +60,10 @@ public class AddReplyFragment extends Fragment {
     private Question question;
     private TypedFile imageTypedFile, videoTypedFile;
     private final int REQUEST_TAKE_GALLERY_VIDEO = 101;
+    private final int REQUEST_TAKE_CAMERA_VIDEO = 102;
     private String imageUrl;
     private String videoUrl;
+    private AlertDialog dialog;
 
     @BindView(R.id.fragment_add_reply_cl_container)
     ConstraintLayout container;
@@ -75,12 +77,16 @@ public class AddReplyFragment extends Fragment {
     ImageView questionImgAttach;
     @BindView(R.id.fragment_add_reply_iv_questionVideoAttach)
     ImageView questionVideoAttach;
+    @BindView(R.id.fragment_add_reply_cl_videoContainer)
+    ConstraintLayout videoContainer;
     @BindView(R.id.fragment_add_reply_iv_play)
     ImageView questionPlay;
     @BindView(R.id.fragment_add_reply_iv_deleteImgAttach)
     ImageView deleteImgAttach;
     @BindView(R.id.fragment_add_reply_iv_deleteVideoAttach)
     ImageView deleteVideoAttach;
+    @BindView(R.id.fragment_add_reply_iv_replyPlay)
+    ImageView replyPlay;
     @BindView(R.id.fragment_add_reply_tv_questionText)
     TextView questionText;
     @BindView(R.id.fragment_add_reply_et_replyText)
@@ -121,7 +127,12 @@ public class AddReplyFragment extends Fragment {
         MainActivity.setupAppbar(true, true, false, false, "account", getString(R.string.addReply));
         FixControl.setupUI(container, activity);
         sessionManager = new SessionManager(activity);
+        GlobalFunctions.hasNewNotificationsApi(activity);
+
         container.setVisibility(View.GONE);
+        replyImgAttach.setVisibility(View.GONE);
+        replyVideoAttach.setVisibility(View.GONE);
+        replyPlay.setVisibility(View.GONE);
         deleteVideoAttach.setVisibility(View.GONE);
         deleteImgAttach.setVisibility(View.GONE);
 
@@ -176,6 +187,8 @@ public class AddReplyFragment extends Fragment {
     }
 
     private void setData() {
+        imageUrl = null;
+        videoUrl = null;
         subjectName.setText(question.subject.getName());
         questionText.setText(question.description);
         for (Attachment value : question.attachments) {
@@ -184,14 +197,26 @@ public class AddReplyFragment extends Fragment {
                     loadImages(value.fileUrl, questionImgAttach);
                     imageUrl = value.fileUrl;
                 } else if (value.fileType.equals("v")) {
-                    loadImages(value.fileUrl, questionVideoAttach);
                     videoUrl = value.fileUrl;
+                    loadImages(value.videoFrameUrl,questionVideoAttach);
                 }
             }
         }
+        if (imageUrl == null || imageUrl.isEmpty()) {
+            questionImgAttach.setVisibility(View.GONE);
+        }
+        if (videoUrl == null || videoUrl.isEmpty()) {
+            videoContainer.setVisibility(View.GONE);
+        }
+
     }
 
     private void loadImages(String url, ImageView image) {
+        int Width = FixControl.getImageWidth(activity, R.mipmap.placeholder_attach);
+        int Height = FixControl.getImageHeight(activity, R.mipmap.placeholder_attach);
+        image.getLayoutParams().height = Height;
+        image.getLayoutParams().width = Width;
+
         Glide.with(activity)
                 .load(url)
                 .apply(new RequestOptions().placeholder(R.mipmap.placeholder_attach)
@@ -201,26 +226,80 @@ public class AddReplyFragment extends Fragment {
 
     @OnClick(R.id.fragment_add_reply_iv_captureImg)
     public void captureImgClick() {
-        ImagePicker.with(this)              //  Initialize ImagePicker with activity or fragment context
-                .setCameraOnly(false)               //  Camera mode
-                .setMultipleMode(false)              //  Select multiple images or single image
-                .setFolderMode(true)                //  Folder mode
-                .setShowCamera(true)                //  Show camera button
-                .setMaxSize(1)                     //  Max images can be selected
-                .setSavePath("ImagePicker")         //  Image capture folder name
-                .setAlwaysShowDoneButton(true)      //  Set always show done button in multiple mode
-                .setKeepScreenOn(true)              //  Keep screen on when selecting images
-                .start();
+        if (!GlobalFunctions.isWriteExternalStorageAllowed(activity)) {
+            GlobalFunctions.requestWriteExternalStoragePermission(activity);
+        } else if (!GlobalFunctions.isReadExternalStorageAllowed(activity)) {
+            GlobalFunctions.requestReadExternalStoragePermission(activity);
+        } else {
+            ImagePicker.with(this)              //  Initialize ImagePicker with activity or fragment context
+                    .setCameraOnly(false)               //  Camera mode
+                    .setMultipleMode(false)              //  Select multiple images or single image
+                    .setFolderMode(true)                //  Folder mode
+                    .setShowCamera(true)                //  Show camera button
+                    .setMaxSize(1)                     //  Max images can be selected
+                    .setSavePath("ImagePicker")         //  Image capture folder name
+                    .setAlwaysShowDoneButton(true)      //  Set always show done button in multiple mode
+                    .setKeepScreenOn(true)              //  Keep screen on when selecting images
+                    .start();
+        }
     }
 
 
     @OnClick(R.id.fragment_add_reply_iv_captureVideo)
     public void captureVideoClick() {
-        final Intent intent1 = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(Intent.createChooser(intent1, "Select Video"), REQUEST_TAKE_GALLERY_VIDEO);
+            if (!GlobalFunctions.isWriteExternalStorageAllowed(activity)) {
+                GlobalFunctions.requestWriteExternalStoragePermission(activity);
+            } else if (!GlobalFunctions.isReadExternalStorageAllowed(activity)) {
+                GlobalFunctions.requestReadExternalStoragePermission(activity);
+            } else if (!GlobalFunctions.isCameraPermission(activity)) {
+                GlobalFunctions.requestCameraPermission(activity);
+            } else {
+                createCaptureVideoMethodsDialog();
+            }
+    }
+
+    public void createCaptureVideoMethodsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        final View popUpView = activity.getLayoutInflater().inflate(R.layout.custom_dialog_capture_video, null);
+        TextView gallery = (TextView) popUpView.findViewById(R.id.custom_dialog_capture_video_tv_gallery);
+        TextView camera = (TextView) popUpView.findViewById(R.id.custom_dialog_capture_video_tv_camera);
+
+        builder.setView(popUpView);
+        dialog = builder.create();
+        dialog.show();
+
+        gallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chooseVideoFromGallery();
+                closePopUp();
+            }
+        });
+
+        camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                takeVideoFromCamera();
+                closePopUp();
+            }
+        });
+    }
+
+
+    public void closePopUp() {
+        dialog.cancel();
 
     }
 
+    private void chooseVideoFromGallery() {
+        final Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(Intent.createChooser(intent, "Select Video"), REQUEST_TAKE_GALLERY_VIDEO);
+    }
+
+    private void takeVideoFromCamera() {
+        Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        startActivityForResult(intent, REQUEST_TAKE_CAMERA_VIDEO);
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -230,62 +309,155 @@ public class AddReplyFragment extends Fragment {
             if (images != null) {
                 for (Image uri : images) {
                     imageTypedFile = new TypedFile("image/*", new File(uri.getPath()));
-                    Glide.with(activity)
-                            .load(uri.getPath())
-                            .apply(new RequestOptions().placeholder(R.mipmap.placeholder_attach)
-                                    .error(R.mipmap.placeholder_attach))
-                            .into(replyImgAttach);
+                    loadImages(uri.getPath(),replyImgAttach);
                 }
 
             }
         } else if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
-                Uri selectedVideo = data.getData();
-                String[] filePathColumn = {MediaStore.Video.Media.DATA};
-                Cursor cursor = getActivity().getContentResolver().query(selectedVideo,
-                        filePathColumn, null, null, null);
-                cursor.moveToFirst();
-                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                String selectedVideoPath = cursor.getString(columnIndex);
-                videoTypedFile = new TypedFile("video/*", new File(selectedVideoPath));
-
-                Bitmap bmThumbnail;
-                bmThumbnail = ThumbnailUtils.createVideoThumbnail(selectedVideoPath, MediaStore.Images.Thumbnails.MICRO_KIND);
-                replyVideoAttach.setImageBitmap(bmThumbnail);
-
+            {
+                Uri selectedVideoUri = data.getData();
+                String videoPath = "";
+                long videoDuration = checkVideoDurationValidation(selectedVideoUri);
+                if (videoDuration > 120000) {
+                    Snackbar.make(loading, getString(R.string.videoDuration), Snackbar.LENGTH_SHORT).show();
+                } else {
+                    if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
+                        videoPath = getPath(selectedVideoUri);
+                    } else if (requestCode == REQUEST_TAKE_CAMERA_VIDEO) {
+                        videoPath = getRealPath(selectedVideoUri);
+                    }
+                    createCompressedVideoPath(videoPath);
+                }
+            }
+        }
+            if (imageTypedFile == null) {
+                replyImgAttach.setVisibility(View.GONE);
+                deleteImgAttach.setVisibility(View.GONE);
+            } else {
+                replyImgAttach.setVisibility(View.VISIBLE);
+                deleteImgAttach.setVisibility(View.VISIBLE);
             }
         }
 
-        if (imageTypedFile == null) {
-            deleteImgAttach.setVisibility(View.GONE);
-        } else {
-            deleteImgAttach.setVisibility(View.VISIBLE);
+    private void createCompressedVideoPath(String videoPath) {
+        String outputDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+        String outputPath = outputDir + File.separator + "VID_" + sessionManager.getUserId() + Calendar.getInstance().getTimeInMillis() + ".mp4";
+        compressVideo(videoPath, outputPath);
+    }
+
+    private String getPath(Uri uri) {
+        String[] projection = {MediaStore.Video.Media.DATA};
+        Cursor cursor = activity.getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null) {
+            int column_index = cursor
+                    .getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } else
+            return null;
+    }
+
+    public String getRealPath(Uri uri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = activity.managedQuery(uri, projection, null, null, null);
+        if (cursor != null) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } else
+            return null;
+    }
+
+    private long checkVideoDurationValidation(Uri uri) {
+        Cursor cursor = MediaStore.Video.query(activity.getContentResolver(), uri, new
+                String[]{MediaStore.Video.VideoColumns.DURATION});
+        long duration = 0;
+        if (cursor != null && cursor.moveToFirst()) {
+            duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Video
+                    .VideoColumns.DURATION));
+            cursor.close();
         }
 
-        if (videoTypedFile == null) {
-            deleteVideoAttach.setVisibility(View.GONE);
-        } else {
-            deleteVideoAttach.setVisibility(View.VISIBLE);
+        return duration;
+    }
+
+    private void compressVideo(String input, final String output){
+        VideoCompress.VideoCompressTask task = VideoCompress.compressVideoLow(input,output, new VideoCompress.CompressListener() {
+            @Override
+            public void onStart() {
+                //Start Compress
+                loading.setVisibility(View.VISIBLE);
+                GlobalFunctions.DisableLayout(container);
+            }
+
+            @Override
+            public void onSuccess() {
+                //Finish successfully
+                loading.setVisibility(View.GONE);
+                GlobalFunctions.EnableLayout(container);
+                Log.d("VIDEO-TAG",output);
+                setVideo(output);
+            }
+
+            @Override
+            public void onFail() {
+                //Failed
+            }
+
+            @Override
+            public void onProgress(float percent) {
+                //Progress
+            }
+        });
+    }
+
+    private void setVideo(String selectedVideoPath) {
+        if (selectedVideoPath != null) {
+            videoTypedFile = new TypedFile("video/*", new File(selectedVideoPath));
+
+            if (videoTypedFile == null) {
+                replyVideoAttach.setVisibility(View.GONE);
+                replyPlay.setVisibility(View.GONE);
+                deleteVideoAttach.setVisibility(View.GONE);
+            } else {
+                replyVideoAttach.setVisibility(View.VISIBLE);
+                replyPlay.setVisibility(View.VISIBLE);
+                deleteVideoAttach.setVisibility(View.VISIBLE);
+            }
+
+            try {
+
+                int Width = FixControl.getImageWidth(activity, R.mipmap.placeholder_attach);
+                int Height = FixControl.getImageHeight(activity, R.mipmap.placeholder_attach);
+                replyVideoAttach.getLayoutParams().height = Height;
+                replyVideoAttach.getLayoutParams().width = Width;
+                replyPlay.getLayoutParams().height = Height;
+                replyPlay.getLayoutParams().width = Width;
+
+                replyVideoAttach.setImageBitmap(GlobalFunctions.loadVideoFrameFromPath(selectedVideoPath));
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
         }
     }
 
     @OnClick(R.id.fragment_add_reply_iv_play)
     public void playClick() {
         if (videoUrl == null || videoUrl.isEmpty()) {
-            Snackbar.make(loading,getString(R.string.noVideo),Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(loading, getString(R.string.noVideo), Snackbar.LENGTH_SHORT).show();
         } else {
-            Navigator.loadFragment(activity, VideoPlayerFragment.newInstance(activity, videoUrl), R.id.activity_main_fl_container, true);
+            Navigator.loadFragment(activity, UrlsFragment.newInstance(activity, videoUrl, "video"), R.id.activity_main_fl_container, true);
         }
     }
 
     @OnClick(R.id.fragment_add_reply_iv_questionImgAttach)
     public void imgAttachClick() {
         if (imageUrl == null || imageUrl.isEmpty()) {
-            Snackbar.make(loading,getString(R.string.noImage),Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(loading, getString(R.string.noImage), Snackbar.LENGTH_SHORT).show();
         } else {
             ArrayList<String> images = new ArrayList<>();
             images.add(imageUrl);
-            Navigator.loadFragment(activity, ImageGestureFragment.newInstance(activity, images,0), R.id.activity_main_fl_container, true);
+            Navigator.loadFragment(activity, ImageGestureFragment.newInstance(activity, images, 0), R.id.activity_main_fl_container, true);
         }
     }
 
@@ -295,6 +467,7 @@ public class AddReplyFragment extends Fragment {
         replyImgAttach.setImageResource(R.mipmap.placeholder_attach);
         imageTypedFile = null;
         deleteImgAttach.setVisibility(View.GONE);
+        replyImgAttach.setVisibility(View.GONE);
     }
 
     @OnClick(R.id.fragment_add_reply_iv_deleteVideoAttach)
@@ -302,6 +475,8 @@ public class AddReplyFragment extends Fragment {
         replyVideoAttach.setImageResource(R.mipmap.placeholder_attach);
         videoTypedFile = null;
         deleteVideoAttach.setVisibility(View.GONE);
+        replyVideoAttach.setVisibility(View.GONE);
+        replyPlay.setVisibility(View.GONE);
     }
 
     @OnClick(R.id.fragment_add_reply_tv_send)
@@ -317,6 +492,7 @@ public class AddReplyFragment extends Fragment {
 
     private void addReplyApi(String replyMessage) {
         loading.setVisibility(View.VISIBLE);
+        GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().addReply(
                 sessionManager.getUserToken(),
                 question.id,
@@ -326,17 +502,22 @@ public class AddReplyFragment extends Fragment {
                     @Override
                     public void success(ArrayList<Reply> reply, Response response) {
                         loading.setVisibility(View.GONE);
+                        GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
                             Snackbar.make(loading, getString(R.string.replyAdded), Snackbar.LENGTH_SHORT).show();
-                            GlobalFunctions.clearLastStack(activity);
-                            Navigator.loadFragment(activity, QuestionDetailsFragment.newInstance(activity, question.id), R.id.activity_main_fl_container, false);
+                            //fix it
+                            getFragmentManager().popBackStack();
+                            //activity.onBackPressed();
+                            //GlobalFunctions.clearStack(activity);
+                            //Navigator.loadFragment(activity, QuestionDetailsFragment.newInstance(activity, question.id), R.id.activity_main_fl_container, false);
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-
+                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        GlobalFunctions.EnableLayout(container);
                     }
                 }
         );
