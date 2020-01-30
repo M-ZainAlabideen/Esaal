@@ -3,24 +3,22 @@ package app.esaal;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
-import java.util.ArrayList;
-
+import app.esaal.classes.AppController;
 import app.esaal.classes.GlobalFunctions;
 import app.esaal.classes.LocaleHelper;
 import app.esaal.classes.SessionManager;
 import app.esaal.webservices.EsaalApiConfig;
-import app.esaal.webservices.responses.notifications.Notification;
-import me.leolin.shortcutbadger.ShortcutBadger;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -30,7 +28,8 @@ public class SplashActivity extends AppCompatActivity {
 
     private SessionManager sessionManager;
     private static final int SPLASH_DISPLAY_LENGTH = 3000;
-    String regId = "";
+    private String regId = "";
+    private String lang;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -78,6 +77,7 @@ public class SplashActivity extends AppCompatActivity {
                 sessionManager.getUserToken(),
                 sessionManager.getUserId(),
                 regId, 2,
+                AppController.getInstance().getDeviceID(),
                 new Callback<Response>() {
                     @Override
                     public void success(Response response, Response response2) {

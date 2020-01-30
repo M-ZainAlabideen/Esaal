@@ -1,17 +1,18 @@
 package app.esaal.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import app.esaal.MainActivity;
 import app.esaal.R;
@@ -61,6 +62,9 @@ public class ChangePasswordFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         MainActivity.setupAppbar(true, false, false, false, "more", getString(R.string.changePassword));
         loading.setVisibility(View.GONE);
         FixControl.setupUI(container, activity);
@@ -77,13 +81,13 @@ public class ChangePasswordFragment extends Fragment {
         String confirmPassStr = confirmPassword.getText().toString();
 
         if (oldPassStr == null || oldPassStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterCurrentPass), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(container, getString(R.string.enterCurrentPass), Snackbar.LENGTH_SHORT).show();
         } else if (newPassStr == null || newPassStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterNewPass), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(container, getString(R.string.enterNewPass), Snackbar.LENGTH_SHORT).show();
         } else if (confirmPassStr == null || confirmPassStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterConfirmPass), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(container, getString(R.string.enterConfirmPass), Snackbar.LENGTH_SHORT).show();
         }else if (!newPassStr.equals(confirmPassStr)) {
-            Snackbar.make(loading, getString(R.string.mismatchPass), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(container, getString(R.string.mismatchPass), Snackbar.LENGTH_SHORT).show();
         }
         else {
             ChangePasswordRequest changePasswordRequest = new ChangePasswordRequest();
@@ -107,7 +111,7 @@ public class ChangePasswordFragment extends Fragment {
                         GlobalFunctions.EnableLayout(container);
                         int status = response2.getStatus();
                         if (status == 200) {
-                            Snackbar.make(loading, getString(R.string.passwordChanged), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(container, getString(R.string.passwordChanged), Snackbar.LENGTH_SHORT).show();
                             //fix it
                             getFragmentManager().popBackStack();
                             //activity.onBackPressed();
@@ -116,14 +120,15 @@ public class ChangePasswordFragment extends Fragment {
                         }
                         else if (status == 202) {
                             loading.setVisibility(View.GONE);
-                            Snackbar.make(loading, getString(R.string.incorrectPassword), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(container, getString(R.string.incorrectPassword), Snackbar.LENGTH_SHORT).show();
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
                         GlobalFunctions.EnableLayout(container);
-                        GlobalFunctions.generalErrorMessage(loading,activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(container,getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 });
     }

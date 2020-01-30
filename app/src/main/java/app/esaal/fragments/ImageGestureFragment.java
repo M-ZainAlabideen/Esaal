@@ -1,10 +1,10 @@
 package app.esaal.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,8 +52,10 @@ public class ImageGestureFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         //hidden MainAppBarLayout and Ads for making the image fullScreen
-        //paintings.add(photoUrl);
         MainActivity.setupAppbar(false,false,false,false,"","");
         viewPager.setAdapter(new ImageGestureAdapter(activity, paintings));
         viewPager.setCurrentItem(position);

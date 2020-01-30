@@ -1,17 +1,16 @@
 package app.esaal.adapters;
 
 import android.content.Context;
-import android.support.annotation.BinderThread;
-import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -133,14 +132,16 @@ public class RepliesAdapter extends RecyclerView.Adapter<RepliesAdapter.viewHold
             viewHolder.dislike.setImageResource(R.mipmap.ic_dislike_unsel);
         }
 
-        for (Attachment value : repliesList.get(position).attachments) {
-            if (value.fileUrl != null && !value.fileUrl.isEmpty()) {
-                if (value.fileType.equals("i")) {
-                    loadImages(value.fileUrl, viewHolder.imgAttach);
-                    imageUrl = value.fileUrl;
-                } else if (value.fileType.equals("v")) {
-                    loadImages(value.videoFrameUrl, viewHolder.videoAttach);
-                    videoUrl = value.fileUrl;
+        if (repliesList.get(position).attachments != null && repliesList.get(position).attachments.size() > 0) {
+            for (Attachment value : repliesList.get(position).attachments) {
+                if (value.fileUrl != null && !value.fileUrl.isEmpty()) {
+                    if (value.fileType.equals("i")) {
+                        loadImages(value.fileUrl, viewHolder.imgAttach);
+                        imageUrl = value.fileUrl;
+                    } else if (value.fileType.equals("v")) {
+                        loadImages(value.videoFrameUrl, viewHolder.videoAttach);
+                        videoUrl = value.fileUrl;
+                    }
                 }
             }
         }

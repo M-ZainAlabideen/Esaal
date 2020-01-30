@@ -2,22 +2,24 @@ package app.esaal.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 
@@ -26,6 +28,7 @@ import java.util.ArrayList;
 import app.esaal.MainActivity;
 import app.esaal.R;
 import app.esaal.SplashActivity;
+import app.esaal.classes.AppController;
 import app.esaal.classes.FixControl;
 import app.esaal.classes.GlobalFunctions;
 import app.esaal.classes.LocaleHelper;
@@ -75,8 +78,12 @@ public class LoginFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         MainActivity.setupAppbar(false, false, false, false, "", "");
         loading.setVisibility(View.GONE);
+        activity = getActivity();
         FixControl.setupUI(container, activity);
         FixControl.closeKeyboardWhenFragmentStart(activity);
         sessionManager = new SessionManager(activity);
@@ -104,9 +111,9 @@ public class LoginFragment extends Fragment {
         String passwordStr = password.getText().toString();
 
         if (userNameStr == null || userNameStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterUserName), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_login_cl_outerContainer), getString(R.string.enterUserName), Snackbar.LENGTH_SHORT).show();
         } else if (passwordStr == null || passwordStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterPassword), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_login_cl_outerContainer), getString(R.string.enterPassword), Snackbar.LENGTH_SHORT).show();
         } else {
             loginApi(userNameStr, passwordStr);
         }
@@ -139,7 +146,7 @@ public class LoginFragment extends Fragment {
 
         activity.finish();
         activity.overridePendingTransition(0, 0);
-        startActivity(new Intent(activity, MainActivity.class));
+        startActivity(new Intent(activity, SplashActivity.class));
         GlobalFunctions.setUpFont(activity);
     }
 
@@ -158,13 +165,15 @@ public class LoginFragment extends Fragment {
                         GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
+                            setupSession(userResponse);
+                            registrationFirebase();
+
                             clearStack();
                             if (userResponse.user.isTeacher) {
                                 if (userResponse.user.isActive) {
-                                    setupSession(userResponse);
                                     Navigator.loadFragment(activity, HomeFragment.newInstance(activity), R.id.activity_main_fl_container, true);
                                 } else {
-                                    Snackbar.make(loading, getString(R.string.notActive), Snackbar.LENGTH_SHORT).show();
+                                    Snackbar.make(activity.findViewById(R.id.fragment_login_cl_outerContainer), getString(R.string.notActive), Snackbar.LENGTH_SHORT).show();
                                 }
                             } else {
                                 if (userResponse.hasPackages) {
@@ -174,7 +183,6 @@ public class LoginFragment extends Fragment {
                                     Navigator.loadFragmentPackages(activity, PackagesFragment.newInstance(activity, "addPackage"), R.id.activity_main_fl_container, "backPackage");
                                 }
                                 setupSession(userResponse);
-                                registrationFirebase();
                             }
                         }
                     }
@@ -184,9 +192,10 @@ public class LoginFragment extends Fragment {
                         GlobalFunctions.EnableLayout(container);
                         if (error.getResponse() != null && error.getResponse().getStatus() == 400) {
                             loading.setVisibility(View.GONE);
-                            Snackbar.make(loading, getString(R.string.invalidLogin), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_login_cl_outerContainer), getString(R.string.invalidLogin), Snackbar.LENGTH_SHORT).show();
                         } else {
-                            GlobalFunctions.generalErrorMessage(loading, activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(activity.findViewById(R.id.fragment_login_cl_outerContainer),getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -215,6 +224,7 @@ public class LoginFragment extends Fragment {
                 sessionManager.getUserToken(),
                 sessionManager.getUserId(),
                 regId, 2,
+                AppController.getInstance().getDeviceID(),
                 new Callback<Response>() {
                     @Override
                     public void success(Response response, Response response2) {
@@ -250,4 +260,5 @@ public class LoginFragment extends Fragment {
                     }
                 });
     }
+
 }

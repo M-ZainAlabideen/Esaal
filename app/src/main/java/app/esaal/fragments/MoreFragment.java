@@ -2,10 +2,10 @@ package app.esaal.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import app.esaal.MainActivity;
 import app.esaal.R;
+import app.esaal.SplashActivity;
 import app.esaal.classes.GlobalFunctions;
 import app.esaal.classes.LocaleHelper;
 import app.esaal.classes.Navigator;
@@ -55,6 +56,9 @@ public class MoreFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         MainActivity.setupAppbar(true, true, false, false, "more", getString(R.string.more));
         sessionManager = new SessionManager(activity);
         GlobalFunctions.hasNewNotificationsApi(activity);
@@ -118,7 +122,7 @@ public class MoreFragment extends Fragment {
 
         activity.finish();
         activity.overridePendingTransition(0, 0);
-        startActivity(new Intent(activity, MainActivity.class));
+        startActivity(new Intent(activity, SplashActivity.class));
         GlobalFunctions.setUpFont(activity);
     }
 

@@ -1,37 +1,35 @@
 package app.esaal.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 
 import app.esaal.MainActivity;
 import app.esaal.R;
-import app.esaal.SplashActivity;
 import app.esaal.adapters.NotificationsAdapter;
 import app.esaal.classes.GlobalFunctions;
 import app.esaal.classes.SessionManager;
 import app.esaal.webservices.EsaalApiConfig;
 import app.esaal.webservices.responses.notifications.Notification;
-import app.esaal.webservices.responses.questionsAndReplies.Question;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import me.leolin.shortcutbadger.ShortcutBadger;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import retrofit.mime.TypedFile;
 
 public class NotificationsFragment extends Fragment {
     public static FragmentActivity activity;
@@ -69,8 +67,10 @@ public class NotificationsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         MainActivity.setupAppbar(true, true, false, false, "notifications", getString(R.string.notifications));
-
         sessionManager = new SessionManager(activity);
         layoutManager = new LinearLayoutManager(activity);
         notifications.setLayoutManager(layoutManager);
@@ -131,17 +131,18 @@ public class NotificationsFragment extends Fragment {
                             }
                         } else if (status == 204) {
                             isLastPage = true;
-                            Snackbar.make(loading, getString(R.string.noNotifications), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(container, getString(R.string.noNotifications), Snackbar.LENGTH_SHORT).show();
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
                         if (error.getResponse() != null && error.getResponse().getStatus() == 204) {
-                            Snackbar.make(loading, getString(R.string.noNotifications), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(container, getString(R.string.noNotifications), Snackbar.LENGTH_SHORT).show();
 
                         } else {
-                            GlobalFunctions.generalErrorMessage(loading, activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(container,getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -180,7 +181,8 @@ public class NotificationsFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         GlobalFunctions.EnableLayout(container);
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(container,getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -201,13 +203,13 @@ public class NotificationsFragment extends Fragment {
                         if (response2.getStatus() == 200) {
                             MainActivity.hasNewNotifications = false;
                             ShortcutBadger.removeCount(activity);
-
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(container,getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 }
         );

@@ -8,12 +8,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +23,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.snackbar.Snackbar;
 import com.nguyenhoanglam.imagepicker.model.Config;
 import com.nguyenhoanglam.imagepicker.model.Image;
 import com.nguyenhoanglam.imagepicker.ui.imagepicker.ImagePicker;
@@ -124,6 +124,9 @@ public class AddReplyFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         MainActivity.setupAppbar(true, true, false, false, "account", getString(R.string.addReply));
         FixControl.setupUI(container, activity);
         sessionManager = new SessionManager(activity);
@@ -166,6 +169,7 @@ public class AddReplyFragment extends Fragment {
         EsaalApiConfig.getCallingAPIInterface().questionById(
                 sessionManager.getUserToken(),
                 questionId,
+                sessionManager.getUserId(),
                 new Callback<ArrayList<Question>>() {
                     @Override
                     public void success(ArrayList<Question> questions, Response response) {
@@ -180,7 +184,8 @@ public class AddReplyFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(activity.findViewById(R.id.fragment_add_reply_cl_outerContainer),getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -319,7 +324,7 @@ public class AddReplyFragment extends Fragment {
                 String videoPath = "";
                 long videoDuration = checkVideoDurationValidation(selectedVideoUri);
                 if (videoDuration > 120000) {
-                    Snackbar.make(loading, getString(R.string.videoDuration), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_add_reply_cl_outerContainer), getString(R.string.videoDuration), Snackbar.LENGTH_SHORT).show();
                 } else {
                     if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
                         videoPath = getPath(selectedVideoUri);
@@ -444,7 +449,7 @@ public class AddReplyFragment extends Fragment {
     @OnClick(R.id.fragment_add_reply_iv_play)
     public void playClick() {
         if (videoUrl == null || videoUrl.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.noVideo), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_add_reply_cl_outerContainer), getString(R.string.noVideo), Snackbar.LENGTH_SHORT).show();
         } else {
             Navigator.loadFragment(activity, UrlsFragment.newInstance(activity, videoUrl, "video"), R.id.activity_main_fl_container, true);
         }
@@ -453,7 +458,7 @@ public class AddReplyFragment extends Fragment {
     @OnClick(R.id.fragment_add_reply_iv_questionImgAttach)
     public void imgAttachClick() {
         if (imageUrl == null || imageUrl.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.noImage), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_add_reply_cl_outerContainer), getString(R.string.noImage), Snackbar.LENGTH_SHORT).show();
         } else {
             ArrayList<String> images = new ArrayList<>();
             images.add(imageUrl);
@@ -483,7 +488,7 @@ public class AddReplyFragment extends Fragment {
     public void sendClick() {
         String replyTextStr = replyText.getText().toString();
         if (replyTextStr == null || replyTextStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterReply), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_add_reply_cl_outerContainer), getString(R.string.enterReply), Snackbar.LENGTH_SHORT).show();
         } else {
 
             addReplyApi(replyTextStr);
@@ -505,7 +510,7 @@ public class AddReplyFragment extends Fragment {
                         GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
-                            Snackbar.make(loading, getString(R.string.replyAdded), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_add_reply_cl_outerContainer), getString(R.string.replyAdded), Snackbar.LENGTH_SHORT).show();
                             //fix it
                             getFragmentManager().popBackStack();
                             //activity.onBackPressed();
@@ -516,7 +521,8 @@ public class AddReplyFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(activity.findViewById(R.id.fragment_add_reply_cl_outerContainer),getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         GlobalFunctions.EnableLayout(container);
                     }
                 }

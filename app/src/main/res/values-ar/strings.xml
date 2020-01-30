@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">إسأل</string>
+    <string name="app_name">ESAAL - إسأل‎</string>
     <string name="userName">اسم المستخدم</string>
     <string name="password">كلمة المرور</string>
     <string name="forgetPasswordLabel">نسيت كلمة المرور؟</string>
@@ -21,7 +21,7 @@
     </string>
     <string name="addQuestion">اضف سؤال</string>
     <string name="questionText">ضع سؤالك هنا ...</string>
-    <string name="addPhoto">إضافة صور</string>
+    <string name="addPhoto">إضافة صورة</string>
     <string name="send">إرسال</string>
     <string name="reply">رد</string>
     <string name="editProfile">تعديل الحساب</string>
@@ -93,7 +93,7 @@
     <string name="civilIdFront">البطاقة المدنية\nالأمامية</string>
     <string name="civilIdBack">البطاقة المدنية\nالخلفية</string>
     <string name="accountNum">رقم الحساب</string>
-    <string name="swiftCode">Swift Code</string>
+    <string name="swiftCode">رقم السويفت</string>
     <string name="bankAddress">عنوان البنك</string>
     <string name="personalAddress">عنوان منزلك</string>
     <string name="IBAN">(IBAN) رقم الحساب الدولي</string>
@@ -167,4 +167,6 @@
     <string name="remainsQuestions">عدد الأسئلة المتبقية من الباقة</string>
     <string name="questions">أسئلة</string>
     <string name="question">سؤال</string>
+    <string name="packageFirst">ليس لديك باقة لإضافة سؤال من فضلك قم بإختيار باقة أولا</string>
+    <string name="canNotShow">لا يمكن عرض هذا السؤال في الوقت الحالي</string>
 </resources>

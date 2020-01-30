@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -39,21 +38,6 @@
         app:layout_constraintStart_toStartOf="@+id/item_reply_tv_title"
         app:layout_constraintTop_toBottomOf="@+id/item_reply_tv_title" />
 
-
-    <!--<android.support.v7.widget.RecyclerView-->
-        <!--android:id="@+id/item_reply_rv_replyAttach"-->
-        <!--android:layout_width="0dp"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_marginStart="8dp"-->
-        <!--android:layout_marginTop="20dp"-->
-        <!--android:layout_marginEnd="12dp"-->
-        <!--android:orientation="horizontal"-->
-        <!--app:layoutManager="android.support.v7.widget.LinearLayoutManager"-->
-        <!--app:layout_constraintEnd_toEndOf="parent"-->
-        <!--app:layout_constraintStart_toStartOf="@+id/item_reply_iv_avatarImg"-->
-        <!--app:layout_constraintTop_toBottomOf="@+id/item_reply_tv_replyText"-->
-        <!--tools:listitem="@layout/item_attachment" />-->
-
     <LinearLayout
         android:id="@+id/item_reply_ll_attachContainer"
         android:layout_width="wrap_content"
@@ -78,7 +62,7 @@
             app:srcCompat="@mipmap/placeholder_attach" />
 
 
-        <android.support.constraint.ConstraintLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/item_reply_cl_videoContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
@@ -107,15 +91,10 @@
                 app:layout_constraintVertical_bias="1.0"
                 app:srcCompat="@mipmap/play" />
 
-        </android.support.constraint.ConstraintLayout>
-
-
-
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
-    
-   
-    
+
     <View
         android:id="@+id/item_reply_v_separatedLine"
         android:layout_width="match_parent"
@@ -148,7 +127,7 @@
         app:layout_constraintTop_toTopOf="@+id/item_reply_tv_replyWord"
         app:srcCompat="@mipmap/ic_reply" />
 
-    
+
     <View
         android:id="@+id/item_reply_v_reply"
         android:layout_width="0dp"
@@ -190,5 +169,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-    
-</android.support.constraint.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

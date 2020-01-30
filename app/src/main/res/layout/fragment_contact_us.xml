@@ -1,162 +1,155 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:fillViewport="true"
-    android:scrollbars="none">
+    android:id="@+id/fragment_contact_us_cl_outerContainer">
 
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/fragment_contact_us_cl_container"
+
+<ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    <LinearLayout
-        android:id="@+id/linearLayout3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="none">
 
-        <ImageView
-            android:id="@+id/fragment_contact_us_iv_youtube"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            app:srcCompat="@mipmap/ic_youtube" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/fragment_contact_us_cl_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/fragment_contact_us_iv_instagram"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            app:srcCompat="@mipmap/ic_instagram" />
+            <LinearLayout
+                android:id="@+id/linearLayout3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="60dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-        <ImageView
-            android:id="@+id/fragment_contact_us_iv_twitter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            app:srcCompat="@mipmap/ic_twitter" />
+                <ImageView
+                    android:id="@+id/fragment_contact_us_iv_youtube"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    app:srcCompat="@mipmap/ic_youtube" />
 
-        <ImageView
-            android:id="@+id/fragment_contact_us_iv_facebook"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            app:srcCompat="@mipmap/ic_facebook" />
-    </LinearLayout>
+                <ImageView
+                    android:id="@+id/fragment_contact_us_iv_instagram"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    app:srcCompat="@mipmap/ic_instagram" />
 
-    <EditText
-        android:id="@+id/fragment_contact_us_et_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="44dp"
-        android:layout_marginEnd="8dp"
-        android:ems="10"
-        android:hint="@string/name"
-        android:padding="20dp"
-        android:background="@mipmap/box_contact_us"
-        android:inputType="textPersonName"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout3" />
+                <ImageView
+                    android:id="@+id/fragment_contact_us_iv_twitter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    app:srcCompat="@mipmap/ic_twitter" />
 
-    <EditText
-        android:id="@+id/fragment_contact_us_et_phone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:padding="20dp"
-        android:hint="@string/phone2"
-        android:inputType="phone"
-        android:textAlignment="viewStart"
-        android:background="@mipmap/box_contact_us"
-        app:layout_constraintEnd_toEndOf="@+id/fragment_contact_us_et_name"
-        app:layout_constraintStart_toStartOf="@+id/fragment_contact_us_et_name"
-        app:layout_constraintTop_toBottomOf="@+id/fragment_contact_us_et_name" />
+                <ImageView
+                    android:id="@+id/fragment_contact_us_iv_facebook"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    app:srcCompat="@mipmap/ic_facebook" />
+            </LinearLayout>
 
-    <EditText
-        android:id="@+id/fragment_contact_us_et_email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@mipmap/box_contact_us"
-        android:ems="10"
-        android:hint="@string/email"
-        android:inputType="textEmailAddress"
-        android:padding="20dp"
-        app:layout_constraintEnd_toEndOf="@+id/fragment_contact_us_et_phone"
-        app:layout_constraintStart_toStartOf="@+id/fragment_contact_us_et_phone"
-        app:layout_constraintTop_toBottomOf="@+id/fragment_contact_us_et_phone" />
+            <EditText
+                android:id="@+id/fragment_contact_us_et_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="44dp"
+                android:layout_marginEnd="8dp"
+                android:background="@mipmap/box_contact_us"
+                android:ems="10"
+                android:hint="@string/name"
+                android:inputType="textPersonName"
+                android:padding="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout3" />
 
+            <EditText
+                android:id="@+id/fragment_contact_us_et_phone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/box_contact_us"
+                android:ems="10"
+                android:hint="@string/phone2"
+                android:inputType="phone"
+                android:padding="20dp"
+                android:textAlignment="viewStart"
+                app:layout_constraintEnd_toEndOf="@+id/fragment_contact_us_et_name"
+                app:layout_constraintStart_toStartOf="@+id/fragment_contact_us_et_name"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_contact_us_et_name" />
 
-    <EditText
-        android:id="@+id/fragment_contact_us_et_subject"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@mipmap/box_contact_us"
-        android:ems="10"
-        android:hint="@string/subject"
-        android:inputType="text"
-        android:padding="20dp"
-        tools:layout_editor_absoluteX="35dp"
-        tools:layout_editor_absoluteY="435dp"
-    app:layout_constraintEnd_toEndOf="@+id/fragment_contact_us_et_email"
-    app:layout_constraintStart_toStartOf="@+id/fragment_contact_us_et_email"
-    app:layout_constraintTop_toBottomOf="@+id/fragment_contact_us_et_email" />
-/>
-
-    <EditText
-        android:id="@+id/fragment_contact_us_et_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@mipmap/box_message"
-        android:gravity="top|start"
-        android:hint="@string/message"
-        android:inputType="textMultiLine"
-        android:lines="4"
-        android:maxLines="4"
-        android:padding="20dp"
-        app:layout_constraintEnd_toEndOf="@+id/fragment_contact_us_et_subject"
-        app:layout_constraintStart_toStartOf="@+id/fragment_contact_us_et_subject"
-        app:layout_constraintTop_toBottomOf="@+id/fragment_contact_us_et_subject" />
-
-    <TextView
-        android:id="@+id/fragment_contact_us_tv_send"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="70dp"
-        android:background="@mipmap/box_btn_send"
-        android:gravity="center"
-        android:text="@string/send"
-        style="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="@+id/fragment_contact_us_et_message"
-        app:layout_constraintStart_toStartOf="@+id/fragment_contact_us_et_message"
-        app:layout_constraintTop_toBottomOf="@+id/fragment_contact_us_et_message" />
+            <EditText
+                android:id="@+id/fragment_contact_us_et_email"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/box_contact_us"
+                android:ems="10"
+                android:hint="@string/email"
+                android:inputType="textEmailAddress"
+                android:padding="20dp"
+                app:layout_constraintEnd_toEndOf="@+id/fragment_contact_us_et_phone"
+                app:layout_constraintStart_toStartOf="@+id/fragment_contact_us_et_phone"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_contact_us_et_phone" />
 
 
-    <ProgressBar
-        android:id="@+id/loading"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        android:indeterminateTint="@color/colorPrimary"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            <EditText
+                android:id="@+id/fragment_contact_us_et_subject"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/box_contact_us"
+                android:ems="10"
+                android:hint="@string/subject"
+                android:inputType="text"
+                android:padding="20dp"
+                app:layout_constraintEnd_toEndOf="@+id/fragment_contact_us_et_email"
+                app:layout_constraintStart_toStartOf="@+id/fragment_contact_us_et_email"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_contact_us_et_email"
+                tools:layout_editor_absoluteX="35dp"
+                tools:layout_editor_absoluteY="435dp" />
+            />
 
-    </android.support.constraint.ConstraintLayout>
-</ScrollView>
+            <EditText
+                android:id="@+id/fragment_contact_us_et_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/box_message"
+                android:gravity="top|start"
+                android:hint="@string/message"
+                android:inputType="textMultiLine"
+                android:lines="4"
+                android:maxLines="4"
+                android:padding="20dp"
+                app:layout_constraintEnd_toEndOf="@+id/fragment_contact_us_et_subject"
+                app:layout_constraintStart_toStartOf="@+id/fragment_contact_us_et_subject"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_contact_us_et_subject" />
+
+            <TextView
+                android:id="@+id/fragment_contact_us_tv_send"
+                style="@style/TextAppearance.AppCompat.Medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="70dp"
+                android:background="@mipmap/box_btn_send"
+                android:gravity="center"
+                android:text="@string/send"
+                android:textColor="@color/white"
+                app:layout_constraintEnd_toEndOf="@+id/fragment_contact_us_et_message"
+                app:layout_constraintStart_toStartOf="@+id/fragment_contact_us_et_message"
+                app:layout_constraintTop_toBottomOf="@+id/fragment_contact_us_et_message" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <include layout="@layout/loading" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

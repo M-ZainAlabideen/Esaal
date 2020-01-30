@@ -5,16 +5,16 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.widget.NestedScrollView;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.widget.NestedScrollView;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +30,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.nguyenhoanglam.imagepicker.model.Config;
@@ -44,6 +45,7 @@ import app.esaal.MainActivity;
 import app.esaal.R;
 import app.esaal.adapters.FilterAdapter;
 import app.esaal.adapters.StaggeredSubjectsAdapter;
+import app.esaal.classes.AppController;
 import app.esaal.classes.FixControl;
 import app.esaal.classes.GlobalFunctions;
 import app.esaal.classes.Navigator;
@@ -80,9 +82,6 @@ public class RegistrationFragment extends Fragment {
     private String type;
     private String regId = "";
 
-
-    @BindView(R.id.fragment_registration_nestedsv_scrollContainer)
-    NestedScrollView scrollContainer;
     @BindView(R.id.fragment_registration_cl_container)
     ConstraintLayout container;
     @BindView(R.id.fragment_registration_et_firstName)
@@ -140,9 +139,6 @@ public class RegistrationFragment extends Fragment {
     TextView terms;
     @BindView(R.id.loading)
     ProgressBar loading;
-    @BindView(R.id.loading2)
-    ProgressBar loading2;
-
 
     public static RegistrationFragment newInstance(FragmentActivity activity) {
         fragment = new RegistrationFragment();
@@ -161,9 +157,12 @@ public class RegistrationFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         sessionManager = new SessionManager(activity);
         FixControl.setupUI(container, activity);
-        loading2.setVisibility(View.GONE);
+        loading.setVisibility(View.GONE);
         //GONE those components in general cases , then in case of Teacher registration and select country the required components will be visible
         accountNum.setVisibility(View.GONE);
         bankAddress.setVisibility(View.GONE);
@@ -326,49 +325,49 @@ public class RegistrationFragment extends Fragment {
         }
 
         if (firstNameStr == null || firstNameStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterFirstName), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.enterFirstName), Snackbar.LENGTH_SHORT).show();
         } else if (lastNameStr == null || lastNameStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterLastName), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.enterLastName), Snackbar.LENGTH_SHORT).show();
         } else if (mobileStr == null || mobileStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterMobile), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.enterMobile), Snackbar.LENGTH_SHORT).show();
         } else if (emailStr == null || emailStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterEmail), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.enterEmail), Snackbar.LENGTH_SHORT).show();
         } else if (userNameStr == null || userNameStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterUserName), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.enterUserName), Snackbar.LENGTH_SHORT).show();
         } else if (passwordStr == null || passwordStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterPassword), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.enterPassword), Snackbar.LENGTH_SHORT).show();
         } else if (!FixControl.isValidEmail(emailStr)) {
-            Snackbar.make(loading, getString(R.string.invalidEmail), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.invalidEmail), Snackbar.LENGTH_SHORT).show();
         } else if (mobileStr.length() < 8 || !FixControl.isValidPhone(mobileStr)) {
-            Snackbar.make(loading, getString(R.string.invalidPhoneNumber), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.invalidPhoneNumber), Snackbar.LENGTH_SHORT).show();
         } else if (passwordStr.length() < 6) {
-            Snackbar.make(loading, getString(R.string.invalidPassword), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.invalidPassword), Snackbar.LENGTH_SHORT).show();
         } else if (!agree.isChecked()) {
-            Snackbar.make(loading, getString(R.string.agreeRequired), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.agreeRequired), Snackbar.LENGTH_SHORT).show();
         } else {
             if (sessionManager.isTeacher()) {
                 if (countryStr.equals(getString(R.string.country))) {
-                    Snackbar.make(loading, getString(R.string.selectYourCountry), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.selectYourCountry), Snackbar.LENGTH_SHORT).show();
                 } else if (bankNameStr == null || bankNameStr.isEmpty()) {
-                    Snackbar.make(loading, getString(R.string.enterBankName), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.enterBankName), Snackbar.LENGTH_SHORT).show();
                 } else if (swiftCodeStr == null || swiftCodeStr.isEmpty()) {
-                    Snackbar.make(loading, getString(R.string.enterSwiftCode), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.enterSwiftCode), Snackbar.LENGTH_SHORT).show();
                 } else if (IBANStr == null || IBANStr.isEmpty()) {
-                    Snackbar.make(loading, getString(R.string.enterIBAN), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.enterIBAN), Snackbar.LENGTH_SHORT).show();
                 } else if (!isGulfCountry && (accountNumStr == null || accountNumStr.isEmpty())) {
-                    Snackbar.make(loading, getString(R.string.enterAccountNumber), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.enterAccountNumber), Snackbar.LENGTH_SHORT).show();
                 } else if (!isGulfCountry && (bankAddressStr == null || bankAddressStr.isEmpty())) {
-                    Snackbar.make(loading, getString(R.string.enterBankAddress), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.enterBankAddress), Snackbar.LENGTH_SHORT).show();
                 } else if (!isGulfCountry && (personalAddressStr == null || personalAddressStr.isEmpty())) {
-                    Snackbar.make(loading, getString(R.string.enterPersonalAddress), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.enterPersonalAddress), Snackbar.LENGTH_SHORT).show();
                 } else if (civilIdFrontFile == null) {
-                    Snackbar.make(loading, getString(R.string.selectCivilIdFrontImg), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.selectCivilIdFrontImg), Snackbar.LENGTH_SHORT).show();
                 } else if (civilIdBackFile == null) {
-                    Snackbar.make(loading, getString(R.string.selectCivilIdBackImg), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.selectCivilIdBackImg), Snackbar.LENGTH_SHORT).show();
                 } else if (certificationFile == null) {
-                    Snackbar.make(loading, getString(R.string.selectCertificationImg), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.selectCertificationImg), Snackbar.LENGTH_SHORT).show();
                 } else if (subjectsIdsStr == null || subjectsIdsStr.isEmpty()) {
-                    Snackbar.make(loading, getString(R.string.selectSubjects), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.selectSubjects), Snackbar.LENGTH_SHORT).show();
                 } else {
                     teacherSignUpApi(
                             firstNameStr, middleNameStr, lastNameStr, mobileStr, emailStr, userNameStr, passwordStr
@@ -466,13 +465,14 @@ public class RegistrationFragment extends Fragment {
                         loading.setVisibility(View.GONE);
                         GlobalFunctions.EnableLayout(container);
                         if (error.getResponse() != null && error.getResponse().getStatus() == 203) {
-                            Snackbar.make(loading, getString(R.string.mobileExists), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.mobileExists), Snackbar.LENGTH_SHORT).show();
                         } else if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
-                            Snackbar.make(loading, getString(R.string.emailExists), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.emailExists), Snackbar.LENGTH_SHORT).show();
                         } else if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
-                            Snackbar.make(loading, getString(R.string.userNameExists), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.userNameExists), Snackbar.LENGTH_SHORT).show();
                         } else {
-                            GlobalFunctions.generalErrorMessage(loading, activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer),getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -486,7 +486,7 @@ public class RegistrationFragment extends Fragment {
             , String accountNum, int countryId, String IBAN, String bankAddress, String personalAddress,
                                   String description, TypedFile userImage,
                                   TypedFile civilIdFront, TypedFile civilIdBack, TypedFile certification) {
-        loading2.setVisibility(View.VISIBLE);
+        loading.setVisibility(View.VISIBLE);
         GlobalFunctions.DisableLayout(container);
 
         EsaalApiConfig.getCallingAPIInterface().teacherSignUp(
@@ -498,19 +498,18 @@ public class RegistrationFragment extends Fragment {
                     @Override
                     public void success(UserResponse userResponse, Response response) {
                         int status = response.getStatus();
-                        loading2.setVisibility(View.GONE);
+                        loading.setVisibility(View.GONE);
                         GlobalFunctions.EnableLayout(container);
                         if (status == 200) {
                             clearStack();
                             if (userResponse.user.isActive) {
-                                registrationFirebase();
                                 setupSession(userResponse);
-                                Snackbar.make(loading, getString(R.string.accountCreatedSuccessfully), Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.accountCreatedSuccessfully), Snackbar.LENGTH_SHORT).show();
                                 Navigator.loadFragment(activity, HomeFragment.newInstance(activity), R.id.activity_main_fl_container, false);
                             } else {
                                 //make isTeacher false again till the admin activate the account
                                 sessionManager.setTeacher(false);
-                                Snackbar.make(loading, getString(R.string.waitingForActivation), Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.waitingForActivation), Snackbar.LENGTH_SHORT).show();
                                 Navigator.loadFragment(activity, LoginFragment.newInstance(activity), R.id.activity_main_fl_container, false);
                             }
                         }
@@ -518,16 +517,17 @@ public class RegistrationFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-                        loading2.setVisibility(View.GONE);
+                        loading.setVisibility(View.GONE);
                         GlobalFunctions.EnableLayout(container);
                         if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
-                            Snackbar.make(loading, getString(R.string.emailExists), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.emailExists), Snackbar.LENGTH_SHORT).show();
                         } else if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
-                            Snackbar.make(loading, getString(R.string.userNameExists), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.userNameExists), Snackbar.LENGTH_SHORT).show();
                         } else if (error.getResponse() != null && error.getResponse().getStatus() == 203) {
-                            Snackbar.make(loading, getString(R.string.mobileExists), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.mobileExists), Snackbar.LENGTH_SHORT).show();
                         } else {
-                            GlobalFunctions.generalErrorMessage(loading2, activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer),getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -562,9 +562,10 @@ public class RegistrationFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
-                            Snackbar.make(loading, getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer), getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
                         } else {
-                            GlobalFunctions.generalErrorMessage(loading, activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(activity.findViewById(R.id.fragment_registration_cl_outerContainer),getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -626,6 +627,7 @@ public class RegistrationFragment extends Fragment {
                 sessionManager.getUserToken(),
                 sessionManager.getUserId(),
                 regId, 2,
+                AppController.getInstance().getDeviceID(),
                 new Callback<Response>() {
                     @Override
                     public void success(Response response, Response response2) {

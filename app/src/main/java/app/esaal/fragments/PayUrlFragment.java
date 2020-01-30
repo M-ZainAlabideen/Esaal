@@ -1,17 +1,11 @@
 package app.esaal.fragments;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 
 import app.esaal.MainActivity;
@@ -69,6 +64,9 @@ public class PayUrlFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         MainActivity.setupAppbar(true,false,false,false,"",getString(R.string.pay));
         sessionManager = new SessionManager(activity);
         if (getArguments() != null) {
@@ -99,11 +97,11 @@ public class PayUrlFragment extends Fragment {
                        // GlobalFunctions.clearStack(activity);
                         if (comingFrom.equals("addPackage")) {
                            // GlobalFunctions.clearStack(activity);
-                                Snackbar.make(loading, getString(R.string.subscriptionSuccessfully), Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(webView, getString(R.string.subscriptionSuccessfully), Snackbar.LENGTH_SHORT).show();
                                 Navigator.loadFragment(activity, MyAccountFragment.newInstance(activity), R.id.activity_main_fl_container, false);
                             } else {
                                 sessionManager.setPackage(true);
-                                Snackbar.make(loading, getString(R.string.accountCreatedSuccessfully), Snackbar.LENGTH_SHORT).show();
+                                Snackbar.make(webView, getString(R.string.accountCreatedSuccessfully), Snackbar.LENGTH_SHORT).show();
                                 Navigator.loadFragment(activity, HomeFragment.newInstance(activity), R.id.activity_main_fl_container, false);
                             }
 
@@ -113,7 +111,7 @@ public class PayUrlFragment extends Fragment {
 
                     else if (url.contains(Constants.ERROR_PAGE)) {
 
-                        Snackbar.make(loading, activity.getString(R.string.OperationFailed), Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(webView, activity.getString(R.string.OperationFailed), Snackbar.LENGTH_LONG).show();
 
                         getFragmentManager().popBackStackImmediate();
 

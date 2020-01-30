@@ -205,6 +205,7 @@ public interface EsaalApiInterface {
     @GET("/GetQuestion")
     void questionById(@Header(Constants.AUTHORIZATION) String authorization,
                       @Query("questionid") int questionId,
+                      @Query("userid") int userId,
                       Callback<ArrayList<Question>> response);
 
     @POST("/LikeReplay")
@@ -249,17 +250,19 @@ public interface EsaalApiInterface {
             Callback<Question> response
     );
 
-    @GET("/AddDevicetoken")
+    @POST("/AddDevicetoken")
     void addDeviceToken(
             @Header(Constants.AUTHORIZATION) String authorization,
             @Query("userid") int userId,
             @Query("token") String token,
             @Query("DeviceType") int DeviceType,
+            @Query("DeviceId") String DeviceId,
             Callback<Response> response);
 
     @POST("/logout")
     void logout(
             @Header(Constants.AUTHORIZATION) String authorization,
             @Query("userid") int userId,
+            @Query("DeviceId") String deviceId,
             Callback<Response> response);
 }

@@ -3,21 +3,20 @@ package app.esaal.fragments;
 import app.esaal.MainActivity;
 import app.esaal.R;
 
-import android.graphics.Typeface;
 import android.os.Bundle;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import app.esaal.classes.GlobalFunctions;
 import app.esaal.classes.SessionManager;
@@ -59,6 +58,9 @@ public class AboutUsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         String title = "";
         if (fragment.getArguments().getBoolean("isTerms")) {
             title = getString(R.string.terms);
@@ -95,7 +97,8 @@ public class AboutUsFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(content, getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 }
         );

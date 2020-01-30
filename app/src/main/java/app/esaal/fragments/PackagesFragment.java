@@ -1,18 +1,20 @@
 package app.esaal.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 
@@ -67,6 +69,9 @@ public class PackagesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         comingFrom = getArguments().getString("comingFrom");
         if (comingFrom.equals("addPackage")) {
             MainActivity.setupAppbar(true, false, false, false, "", getString(R.string.addPackage));
@@ -111,7 +116,8 @@ public class PackagesFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(container,getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -141,7 +147,8 @@ public class PackagesFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         GlobalFunctions.EnableLayout(container);
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(container,getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 }
 

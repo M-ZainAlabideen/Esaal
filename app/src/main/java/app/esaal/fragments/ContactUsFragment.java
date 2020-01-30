@@ -1,17 +1,18 @@
 package app.esaal.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 
@@ -73,6 +74,9 @@ public class ContactUsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         MainActivity.setupAppbar(true, true, false, false, "more", getString(R.string.contactUs));
         FixControl.setupUI(container, activity);
         sessionManager = new SessionManager(activity);
@@ -97,7 +101,7 @@ public class ContactUsFragment extends Fragment {
         if (facebookLink != null && !facebookLink.isEmpty()) {
             Navigator.loadFragment(activity, UrlsFragment.newInstance(activity, facebookLink,"link"), R.id.activity_main_fl_container, true);
         } else {
-            Snackbar.make(loading, getString(R.string.noLink), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_contact_us_cl_outerContainer), getString(R.string.noLink), Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -106,7 +110,7 @@ public class ContactUsFragment extends Fragment {
         if (instagramLink != null && !instagramLink.isEmpty()) {
             Navigator.loadFragment(activity, UrlsFragment.newInstance(activity, instagramLink,"link"), R.id.activity_main_fl_container, true);
         } else {
-            Snackbar.make(loading, getString(R.string.noLink), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_contact_us_cl_outerContainer), getString(R.string.noLink), Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -115,7 +119,7 @@ public class ContactUsFragment extends Fragment {
         if (twitterLink != null && !twitterLink.isEmpty()) {
             Navigator.loadFragment(activity, UrlsFragment.newInstance(activity, twitterLink,"link"), R.id.activity_main_fl_container, true);
         } else {
-            Snackbar.make(loading, getString(R.string.noLink), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_contact_us_cl_outerContainer), getString(R.string.noLink), Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -124,7 +128,7 @@ public class ContactUsFragment extends Fragment {
         if (youtubeLink != null && !youtubeLink.isEmpty()) {
             Navigator.loadFragment(activity, UrlsFragment.newInstance(activity, youtubeLink,"link"), R.id.activity_main_fl_container, true);
         } else {
-            Snackbar.make(loading, getString(R.string.noLink), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_contact_us_cl_outerContainer), getString(R.string.noLink), Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -137,19 +141,19 @@ public class ContactUsFragment extends Fragment {
         String subjectStr = subject.getText().toString();
         String messageStr = message.getText().toString();
         if (nameStr == null || nameStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterFullName), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_contact_us_cl_outerContainer), getString(R.string.enterFullName), Snackbar.LENGTH_SHORT).show();
         } else if (phoneStr == null || phoneStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterMobile), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_contact_us_cl_outerContainer), getString(R.string.enterMobile), Snackbar.LENGTH_SHORT).show();
         } else if (emailStr == null || emailStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterEmail), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_contact_us_cl_outerContainer), getString(R.string.enterEmail), Snackbar.LENGTH_SHORT).show();
         } else if (subjectStr == null || subjectStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterSubject), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_contact_us_cl_outerContainer), getString(R.string.enterSubject), Snackbar.LENGTH_SHORT).show();
         } else if (messageStr == null || messageStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterMessage), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_contact_us_cl_outerContainer), getString(R.string.enterMessage), Snackbar.LENGTH_SHORT).show();
         } else if (!FixControl.isValidEmail(emailStr)) {
-            Snackbar.make(loading, getString(R.string.invalidEmail), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_contact_us_cl_outerContainer), getString(R.string.invalidEmail), Snackbar.LENGTH_SHORT).show();
         } else if (phoneStr.length() < 8 || !FixControl.isValidPhone(phoneStr)) {
-            Snackbar.make(loading, getString(R.string.invalidPhoneNumber), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_contact_us_cl_outerContainer), getString(R.string.invalidPhoneNumber), Snackbar.LENGTH_SHORT).show();
         } else {
             SendMessageRequest sendMessageRequest = new SendMessageRequest();
             sendMessageRequest.name = nameStr;
@@ -185,7 +189,8 @@ public class ContactUsFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(activity.findViewById(R.id.fragment_contact_us_cl_outerContainer),getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         GlobalFunctions.EnableLayout(container);
                     }
                 }
@@ -220,7 +225,8 @@ public class ContactUsFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(activity.findViewById(R.id.fragment_contact_us_cl_outerContainer),getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         GlobalFunctions.EnableLayout(container);
                     }
                 }
@@ -239,14 +245,15 @@ public class ContactUsFragment extends Fragment {
                         GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
-                            Snackbar.make(loading, getString(R.string.thanksMessage), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_contact_us_cl_outerContainer), getString(R.string.thanksMessage), Snackbar.LENGTH_SHORT).show();
                             Navigator.loadFragment(activity, HomeFragment.newInstance(activity), R.id.activity_main_fl_container, false);
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(activity.findViewById(R.id.fragment_contact_us_cl_outerContainer),getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         GlobalFunctions.EnableLayout(container);
                     }
                 }

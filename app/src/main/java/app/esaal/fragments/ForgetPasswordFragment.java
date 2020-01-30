@@ -1,17 +1,18 @@
 package app.esaal.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import app.esaal.R;
 import app.esaal.classes.FixControl;
@@ -53,6 +54,9 @@ public class ForgetPasswordFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         loading.setVisibility(View.GONE);
         FixControl.setupUI(container, activity);
 
@@ -63,10 +67,10 @@ public class ForgetPasswordFragment extends Fragment {
     public void sendClick() {
         String emailStr = email.getText().toString();
         if(emailStr == null || emailStr.isEmpty()){
-            Snackbar.make(loading,getString(R.string.enterEmail),Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(container,getString(R.string.enterEmail),Snackbar.LENGTH_SHORT).show();
         }
         else if(!FixControl.isValidEmail(emailStr)){
-            Snackbar.make(loading,getString(R.string.invalidEmail),Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(container,getString(R.string.invalidEmail),Snackbar.LENGTH_SHORT).show();
         }
         else{
             forgetPasswordApi(emailStr);
@@ -84,7 +88,7 @@ public class ForgetPasswordFragment extends Fragment {
                         GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
-                            Snackbar.make(loading,getString(R.string.checkYourMail),Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(container,getString(R.string.checkYourMail),Snackbar.LENGTH_SHORT).show();
                             Navigator.loadFragment(activity,LoginFragment.newInstance(activity),R.id.activity_main_fl_container,false);
                         }
                     }
@@ -94,10 +98,11 @@ public class ForgetPasswordFragment extends Fragment {
                         GlobalFunctions.EnableLayout(container);
                         if (error.getResponse() != null && error.getResponse().getStatus() == 203) {
                             loading.setVisibility(View.GONE);
-                            Snackbar.make(loading,getString(R.string.notFoundEmail),Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(container,getString(R.string.notFoundEmail),Snackbar.LENGTH_SHORT).show();
                         }
                         else{
-                            GlobalFunctions.generalErrorMessage(loading,activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(container,getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 });

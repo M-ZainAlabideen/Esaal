@@ -1,28 +1,20 @@
 package app.esaal.classes;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+import com.google.android.material.snackbar.Snackbar;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,7 +30,6 @@ import me.leolin.shortcutbadger.ShortcutBadger;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
-import retrofit.mime.TypedInput;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 
 public class GlobalFunctions {
@@ -128,10 +119,10 @@ public class GlobalFunctions {
         return formattedDate;
     }
 
-    public static void generalErrorMessage(ProgressBar loading, Context context) {
-        loading.setVisibility(View.GONE);
-        Snackbar.make(loading, context.getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
-    }
+//    public static void generalErrorMessage(ProgressBar loading, Context context) {
+//        loading.setVisibility(View.GONE);
+//        Snackbar.make(loading, context.getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
+//    }
 
     public static void setDefaultLanguage(Context context) {
         SessionManager sessionManager = new SessionManager(context);

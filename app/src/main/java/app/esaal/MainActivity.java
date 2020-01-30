@@ -4,21 +4,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.CountDownTimer;
-import android.support.constraint.ConstraintLayout;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+
 import android.os.Bundle;
-import android.telephony.SubscriptionPlan;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.support.v7.widget.SearchView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+import com.google.android.material.snackbar.Snackbar;
 
 import app.esaal.classes.GlobalFunctions;
 import app.esaal.classes.LocaleHelper;
@@ -30,16 +32,10 @@ import app.esaal.fragments.LoginFragment;
 import app.esaal.fragments.MoreFragment;
 import app.esaal.fragments.MyAccountFragment;
 import app.esaal.fragments.NotificationsFragment;
-import app.esaal.fragments.PackagesFragment;
 import app.esaal.fragments.QuestionDetailsFragment;
-import app.esaal.webservices.EsaalApiConfig;
-import app.esaal.webservices.responses.notifications.Notification;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import me.leolin.shortcutbadger.ShortcutBadger;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 public class MainActivity extends AppCompatActivity {
@@ -62,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     public static boolean isEnglish;
     public static SessionManager sessionManager;
     public static boolean hasNewNotifications;
+    private String lang;
 
     @Override
     protected void attachBaseContext(Context newBase) {
@@ -141,7 +138,11 @@ public class MainActivity extends AppCompatActivity {
         if (sessionManager.isGuest()) {
             Navigator.loadFragment(MainActivity.this, LoginFragment.newInstance(MainActivity.this), R.id.activity_main_fl_container, false);
         } else {
-            Navigator.loadFragment(MainActivity.this, AddQuestionFragment.newInstance(MainActivity.this, "add", null), R.id.activity_main_fl_container, true);
+            if(sessionManager.hasPackage()) {
+                Navigator.loadFragment(this, AddQuestionFragment.newInstance(this, "add", null), R.id.activity_main_fl_container, true);
+            } else{
+                Snackbar.make(appbar, getString(R.string.packageFirst), Snackbar.LENGTH_SHORT).show();
+            }
         }
     }
 

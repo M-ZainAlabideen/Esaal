@@ -4,15 +4,15 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,14 +22,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.snackbar.Snackbar;
 
-import java.sql.Time;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import app.esaal.MainActivity;
@@ -121,6 +116,9 @@ public class QuestionDetailsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         MainActivity.setupAppbar(true, true, false, false, "account", getString(R.string.questionsAndReplies));
         sessionManager = new SessionManager(activity);
         GlobalFunctions.hasNewNotificationsApi(activity);
@@ -142,16 +140,16 @@ public class QuestionDetailsFragment extends Fragment {
     @OnClick(R.id.fragment_question_details_iv_play)
     public void playClick() {
         if (videoUrl == null || videoUrl.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.noVideo), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_question_details_cl_outerContainer), getString(R.string.noVideo), Snackbar.LENGTH_SHORT).show();
         } else {
-            Navigator.loadFragment(activity, UrlsFragment.newInstance(activity, videoUrl,"video"), R.id.activity_main_fl_container, true);
+            Navigator.loadFragment(activity, UrlsFragment.newInstance(activity, videoUrl, "video"), R.id.activity_main_fl_container, true);
         }
     }
 
     @OnClick(R.id.fragment_question_details_iv_imgAttach)
     public void imgAttachClick() {
         if (imageUrl == null || imageUrl.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.noImage), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_question_details_cl_outerContainer), getString(R.string.noImage), Snackbar.LENGTH_SHORT).show();
         } else {
             ArrayList<String> images = new ArrayList<>();
             images.add(imageUrl);
@@ -218,15 +216,15 @@ public class QuestionDetailsFragment extends Fragment {
                     imageUrl = value.fileUrl;
                 } else if (value.fileType.equals("v")) {
                     videoUrl = value.fileUrl;
-                    loadImages(value.videoFrameUrl,videoAttach);
+                    loadImages(value.videoFrameUrl, videoAttach);
                 }
             }
         }
 
-        if(imageUrl == null || imageUrl.isEmpty()){
+        if (imageUrl == null || imageUrl.isEmpty()) {
             imgAttach.setVisibility(View.GONE);
         }
-        if(videoUrl == null || videoUrl.isEmpty()){
+        if (videoUrl == null || videoUrl.isEmpty()) {
             videoContainer.setVisibility(View.GONE);
         }
 
@@ -254,7 +252,7 @@ public class QuestionDetailsFragment extends Fragment {
                 @Override
                 public void imgAttach(int position, ArrayList<String> images) {
                     if (images == null || images.isEmpty()) {
-                        Snackbar.make(loading, getString(R.string.noImage), Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(activity.findViewById(R.id.fragment_question_details_cl_outerContainer), getString(R.string.noImage), Snackbar.LENGTH_SHORT).show();
                     } else {
                         Navigator.loadFragment(activity, ImageGestureFragment.newInstance(activity, images, 0), R.id.activity_main_fl_container, true);
                     }
@@ -263,9 +261,9 @@ public class QuestionDetailsFragment extends Fragment {
                 @Override
                 public void videoAttach(int position, String videoUrl) {
                     if (videoUrl == null || videoUrl.isEmpty()) {
-                        Snackbar.make(loading, getString(R.string.noVideo), Snackbar.LENGTH_SHORT).show();
+                        Snackbar.make(activity.findViewById(R.id.fragment_question_details_cl_outerContainer), getString(R.string.noVideo), Snackbar.LENGTH_SHORT).show();
                     } else {
-                        Navigator.loadFragment(activity, UrlsFragment.newInstance(activity, videoUrl,"video"), R.id.activity_main_fl_container, true);
+                        Navigator.loadFragment(activity, UrlsFragment.newInstance(activity, videoUrl, "video"), R.id.activity_main_fl_container, true);
                     }
                 }
             });
@@ -298,6 +296,7 @@ public class QuestionDetailsFragment extends Fragment {
         EsaalApiConfig.getCallingAPIInterface().questionById(
                 sessionManager.getUserToken(),
                 questionId,
+                sessionManager.getUserId(),
                 new Callback<ArrayList<Question>>() {
                     @Override
                     public void success(ArrayList<Question> questions, Response response) {
@@ -305,14 +304,19 @@ public class QuestionDetailsFragment extends Fragment {
                         container.setVisibility(View.VISIBLE);
                         int status = response.getStatus();
                         if (status == 200) {
-                            fragment.question = questions.get(0);
-                            setData();
+                            if (questions != null && questions.size() != 0) {
+                                fragment.question = questions.get(0);
+                                setData();
+                            } else {
+                                Snackbar.make(activity.findViewById(R.id.fragment_question_details_cl_outerContainer), getString(R.string.canNotShow), Snackbar.LENGTH_SHORT).show();
+                            }
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(activity.findViewById(R.id.fragment_question_details_cl_outerContainer), getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -341,7 +345,8 @@ public class QuestionDetailsFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         GlobalFunctions.EnableLayout(container);
-                        GlobalFunctions.generalErrorMessage(loading,activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(activity.findViewById(R.id.fragment_question_details_cl_outerContainer), getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -372,7 +377,8 @@ public class QuestionDetailsFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         GlobalFunctions.EnableLayout(container);
-                        GlobalFunctions.generalErrorMessage(loading,activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(activity.findViewById(R.id.fragment_question_details_cl_outerContainer), getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -391,14 +397,15 @@ public class QuestionDetailsFragment extends Fragment {
                             millisecond = (long) question.remainTime;
                             setRemainingTime();
                         } else if (status == 204) {
-                            Snackbar.make(loading, getString(R.string.oneReservation), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_question_details_cl_outerContainer), getString(R.string.oneReservation), Snackbar.LENGTH_SHORT).show();
 
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                        GlobalFunctions.generalErrorMessage(loading,activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(activity.findViewById(R.id.fragment_question_details_cl_outerContainer), getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -420,7 +427,8 @@ public class QuestionDetailsFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-                        GlobalFunctions.generalErrorMessage(loading,activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(activity.findViewById(R.id.fragment_question_details_cl_outerContainer), getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 }
         );

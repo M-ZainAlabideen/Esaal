@@ -1,23 +1,25 @@
 package app.esaal.fragments;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import javax.microedition.khronos.egl.EGLSurface;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import app.esaal.MainActivity;
 import app.esaal.R;
+import app.esaal.classes.AppController;
 import app.esaal.classes.GlobalFunctions;
 import app.esaal.classes.Navigator;
 import app.esaal.classes.SessionManager;
@@ -58,6 +60,9 @@ public class MyAccountFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         MainActivity.setupAppbar(true, true, false, false, "account", getString(R.string.myAccount));
         sessionManager = new SessionManager(activity);
         GlobalFunctions.hasNewNotificationsApi(activity);
@@ -106,6 +111,7 @@ public class MyAccountFragment extends Fragment {
         EsaalApiConfig.getCallingAPIInterface().logout(
                 sessionManager.getUserToken(),
                 sessionManager.getUserId(),
+                AppController.getInstance().getDeviceID(),
                 new Callback<Response>() {
                     @Override
                     public void success(Response response, Response response2) {
@@ -128,7 +134,8 @@ public class MyAccountFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         GlobalFunctions.EnableLayout(container);
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(container,getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 }
         );

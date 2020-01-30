@@ -4,14 +4,15 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.riontech.staggeredtextgridview.StaggeredTextGridView;
 
 import java.util.ArrayList;
@@ -111,8 +113,6 @@ public class EditProfileFragment extends Fragment {
     StaggeredTextGridView subjects;
     @BindView(R.id.loading)
     ProgressBar loading;
-    @BindView(R.id.loading2)
-    ProgressBar loading2;
 
     public static EditProfileFragment newInstance(FragmentActivity activity) {
         fragment = new EditProfileFragment();
@@ -131,6 +131,9 @@ public class EditProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         MainActivity.setupAppbar(true, true, false, false, "account", getString(R.string.editProfile));
         FixControl.setupUI(container, activity);
         sessionManager = new SessionManager(activity);
@@ -156,7 +159,6 @@ public class EditProfileFragment extends Fragment {
         subjects.setVisibility(View.GONE);
         descriptionWord.setVisibility(View.GONE);
         description.setVisibility(View.GONE);
-        loading2.setVisibility(View.GONE);
 
         if (sessionManager.isTeacher()) {
             if (countriesList.size() > 0) {
@@ -209,35 +211,35 @@ public class EditProfileFragment extends Fragment {
 
 
         if (firstNameStr == null || firstNameStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterFirstName), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.enterFirstName), Snackbar.LENGTH_SHORT).show();
         } else if (lastNameStr == null || lastNameStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterLastName), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.enterLastName), Snackbar.LENGTH_SHORT).show();
         } else if (mobileStr == null || mobileStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterMobile), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.enterMobile), Snackbar.LENGTH_SHORT).show();
         } else if (emailStr == null || emailStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterEmail), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.enterEmail), Snackbar.LENGTH_SHORT).show();
         } else if (userNameStr == null || userNameStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterUserName), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.enterUserName), Snackbar.LENGTH_SHORT).show();
         } else if (!FixControl.isValidEmail(emailStr)) {
-            Snackbar.make(loading, getString(R.string.invalidEmail), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.invalidEmail), Snackbar.LENGTH_SHORT).show();
         } else {
             if (sessionManager.isTeacher()) {
                 if (countryStr.equals(getString(R.string.country))) {
-                    Snackbar.make(loading, getString(R.string.selectYourCountry), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.selectYourCountry), Snackbar.LENGTH_SHORT).show();
                 } else if (bankNameStr == null || bankNameStr.isEmpty()) {
-                    Snackbar.make(loading, getString(R.string.enterBankName), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.enterBankName), Snackbar.LENGTH_SHORT).show();
                 } else if (swiftCodeStr == null || swiftCodeStr.isEmpty()) {
-                    Snackbar.make(loading, getString(R.string.enterSwiftCode), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.enterSwiftCode), Snackbar.LENGTH_SHORT).show();
                 } else if (isGulfCountry && (IBANStr == null || IBANStr.isEmpty())) {
-                    Snackbar.make(loading, getString(R.string.enterIBAN), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.enterIBAN), Snackbar.LENGTH_SHORT).show();
                 } else if (!isGulfCountry && (accountNumStr == null || accountNumStr.isEmpty())) {
-                    Snackbar.make(loading, getString(R.string.enterAccountNumber), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.enterAccountNumber), Snackbar.LENGTH_SHORT).show();
                 } else if (!isGulfCountry && (bankAddressStr == null || bankAddressStr.isEmpty())) {
-                    Snackbar.make(loading, getString(R.string.enterBankAddress), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.enterBankAddress), Snackbar.LENGTH_SHORT).show();
                 } else if (!isGulfCountry && (personalAddressStr == null || personalAddressStr.isEmpty())) {
-                    Snackbar.make(loading, getString(R.string.enterPersonalAddress), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.enterPersonalAddress), Snackbar.LENGTH_SHORT).show();
                 } else if (subjectsIdsStr == null || subjectsIdsStr.isEmpty()) {
-                    Snackbar.make(loading, getString(R.string.selectSubjects), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.selectSubjects), Snackbar.LENGTH_SHORT).show();
                 } else {
                     TeacherRequest teacher = new TeacherRequest();
                     teacher.userId = sessionManager.getUserId();
@@ -399,7 +401,8 @@ public class EditProfileFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         GlobalFunctions.EnableLayout(container);
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -418,7 +421,7 @@ public class EditProfileFragment extends Fragment {
                         GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
-                            Snackbar.make(loading, getString(R.string.profileUpdatedSuccessfully), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.profileUpdatedSuccessfully), Snackbar.LENGTH_SHORT).show();
                             Navigator.loadFragment(activity, MyAccountFragment.newInstance(activity), R.id.activity_main_fl_container, false);
                         }
                     }
@@ -428,13 +431,14 @@ public class EditProfileFragment extends Fragment {
                         loading.setVisibility(View.GONE);
                         GlobalFunctions.EnableLayout(container);
                         if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
-                            Snackbar.make(loading, getString(R.string.emailExists), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.emailExists), Snackbar.LENGTH_SHORT).show();
                         } else if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
-                            Snackbar.make(loading, getString(R.string.userNameExists), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.userNameExists), Snackbar.LENGTH_SHORT).show();
                         } else if (error.getResponse() != null && error.getResponse().getStatus() == 203) {
-                            Snackbar.make(loading, getString(R.string.mobileExists), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.mobileExists), Snackbar.LENGTH_SHORT).show();
                         } else {
-                            GlobalFunctions.generalErrorMessage(loading, activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -442,7 +446,7 @@ public class EditProfileFragment extends Fragment {
     }
 
     private void editTeacherProfileApi(TeacherRequest teacherRequest) {
-        loading2.setVisibility(View.VISIBLE);
+        loading.setVisibility(View.VISIBLE);
         GlobalFunctions.DisableLayout(container);
         EsaalApiConfig.getCallingAPIInterface().editTeacherProfile(
                 sessionManager.getUserToken(),
@@ -450,27 +454,28 @@ public class EditProfileFragment extends Fragment {
                 new Callback<User>() {
                     @Override
                     public void success(User user, Response response) {
-                        loading2.setVisibility(View.GONE);
+                        loading.setVisibility(View.GONE);
                         GlobalFunctions.EnableLayout(container);
                         int status = response.getStatus();
                         if (status == 200) {
-                            Snackbar.make(loading, getString(R.string.profileUpdatedSuccessfully), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.profileUpdatedSuccessfully), Snackbar.LENGTH_SHORT).show();
                             Navigator.loadFragment(activity, MyAccountFragment.newInstance(activity), R.id.activity_main_fl_container, false);
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                        loading2.setVisibility(View.GONE);
+                        loading.setVisibility(View.GONE);
                         GlobalFunctions.EnableLayout(container);
                         if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
-                            Snackbar.make(loading, getString(R.string.emailExists), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.emailExists), Snackbar.LENGTH_SHORT).show();
                         } else if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
-                            Snackbar.make(loading, getString(R.string.userNameExists), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.userNameExists), Snackbar.LENGTH_SHORT).show();
                         } else if (error.getResponse() != null && error.getResponse().getStatus() == 203) {
-                            Snackbar.make(loading, getString(R.string.mobileExists), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.mobileExists), Snackbar.LENGTH_SHORT).show();
                         } else {
-                            GlobalFunctions.generalErrorMessage(loading2, activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -492,9 +497,10 @@ public class EditProfileFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
-                            Snackbar.make(loading, getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
                         } else {
-                            GlobalFunctions.generalErrorMessage(loading, activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -523,9 +529,10 @@ public class EditProfileFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
-                            Snackbar.make(loading, getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
                         } else {
-                            GlobalFunctions.generalErrorMessage(loading, activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -546,7 +553,8 @@ public class EditProfileFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(activity.findViewById(R.id.fragment_edit_profile_cl_outerContainer), getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 }
         );

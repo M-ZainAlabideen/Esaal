@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ESAAL</string>
+    <string name="app_name">ESAAL - إسأل‎</string>
     <string name="userName">User Name</string>
     <string name="password">Password</string>
     <string name="forgetPasswordLabel">Forget Password ?</string>
@@ -166,5 +166,7 @@ Get answers to all questions in all subjects for different levels of education,
     <string name="remainsQuestions">Remains Questions</string>
     <string name="questions">Questions</string>
     <string name="question">Questions</string>
+    <string name="packageFirst">Please Select Package First to Add Question</string>
+    <string name="canNotShow">لا يمكن عرض هذا السؤال في الوقت الحالي</string>
 
 </resources>

@@ -8,14 +8,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.google.android.material.snackbar.Snackbar;
 import com.nguyenhoanglam.imagepicker.model.Config;
 import com.nguyenhoanglam.imagepicker.model.Image;
 import com.nguyenhoanglam.imagepicker.ui.imagepicker.ImagePicker;
@@ -122,6 +123,9 @@ public class AddQuestionFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         FixControl.setupUI(container, activity);
         sessionManager = new SessionManager(activity);
         container.setVisibility(View.GONE);
@@ -187,7 +191,7 @@ public class AddQuestionFragment extends Fragment {
                         .start();
             }
         } else {
-            Snackbar.make(loading, getString(R.string.removeImgFirst), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_add_question_cl_outerContainer), getString(R.string.removeImgFirst), Snackbar.LENGTH_SHORT).show();
         }
 
     }
@@ -205,7 +209,7 @@ public class AddQuestionFragment extends Fragment {
                 createCaptureVideoMethodsDialog();
             }
         } else {
-            Snackbar.make(loading, getString(R.string.removeVideoFirst), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_add_question_cl_outerContainer), getString(R.string.removeVideoFirst), Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -268,7 +272,7 @@ public class AddQuestionFragment extends Fragment {
             String videoPath = "";
             long videoDuration = checkVideoDurationValidation(selectedVideoUri);
             if (videoDuration > 120000) {
-                Snackbar.make(loading, getString(R.string.videoDuration), Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(activity.findViewById(R.id.fragment_add_question_cl_outerContainer), getString(R.string.videoDuration), Snackbar.LENGTH_SHORT).show();
             } else {
                 if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
                     videoPath = getPath(selectedVideoUri);
@@ -427,13 +431,13 @@ public class AddQuestionFragment extends Fragment {
     public void sendClick() {
         String questionTextStr = questionText.getText().toString();
         if (questionTextStr == null || questionTextStr.isEmpty()) {
-            Snackbar.make(loading, getString(R.string.enterQuestion), Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(activity.findViewById(R.id.fragment_add_question_cl_outerContainer), getString(R.string.enterQuestion), Snackbar.LENGTH_SHORT).show();
         } else {
             if (comingFrom.equals("update")) {
                 updateQuestionApi(question.id, selectedSubjectId, sessionManager.getUserId(), questionTextStr);
             } else {
                 if (selectedSubjectId == -1) {
-                    Snackbar.make(loading, getString(R.string.selectSubject), Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(activity.findViewById(R.id.fragment_add_question_cl_outerContainer), getString(R.string.selectSubject), Snackbar.LENGTH_SHORT).show();
                 } else {
                     addQuestionApi(selectedSubjectId, questionTextStr);
                 }
@@ -466,9 +470,10 @@ public class AddQuestionFragment extends Fragment {
                         loading.setVisibility(View.GONE);
                         GlobalFunctions.EnableLayout(container);
                         if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
-                            Snackbar.make(loading, getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_add_question_cl_outerContainer), getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
                         } else {
-                            GlobalFunctions.generalErrorMessage(loading, activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(activity.findViewById(R.id.fragment_add_question_cl_outerContainer),getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -534,7 +539,7 @@ public class AddQuestionFragment extends Fragment {
                         if (status == 200) {
                             getFragmentManager().popBackStack();
                             Navigator.loadFragment(activity, HomeFragment.newInstance(activity), R.id.activity_main_fl_container, false);
-                            Snackbar.make(loading, getString(R.string.questionAdded), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_add_question_cl_outerContainer), getString(R.string.questionAdded), Snackbar.LENGTH_SHORT).show();
                         }
                     }
 
@@ -543,9 +548,10 @@ public class AddQuestionFragment extends Fragment {
                         loading.setVisibility(View.GONE);
                         GlobalFunctions.EnableLayout(container);
                         if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
-                            Snackbar.make(loading, getString(R.string.noBalance), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_add_question_cl_outerContainer), getString(R.string.noBalance), Snackbar.LENGTH_SHORT).show();
                         } else {
-                            GlobalFunctions.generalErrorMessage(loading, activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(activity.findViewById(R.id.fragment_add_question_cl_outerContainer),getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -568,14 +574,15 @@ public class AddQuestionFragment extends Fragment {
                         GlobalFunctions.EnableLayout(container);
                         int status = response2.getStatus();
                         if (status == 200) {
-                            Snackbar.make(loading, getString(R.string.updateSuccess), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_add_question_cl_outerContainer), getString(R.string.updateSuccess), Snackbar.LENGTH_SHORT).show();
                             getFragmentManager().popBackStack();
                         }
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(activity.findViewById(R.id.fragment_add_question_cl_outerContainer),getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         GlobalFunctions.EnableLayout(container);
                     }
                 }
@@ -606,7 +613,8 @@ public class AddQuestionFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(activity.findViewById(R.id.fragment_add_question_cl_outerContainer),getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         GlobalFunctions.EnableLayout(container);
                     }
                 }

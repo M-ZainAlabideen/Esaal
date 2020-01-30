@@ -3,16 +3,16 @@ package app.esaal.fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +21,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import org.w3c.dom.Text;
 
@@ -82,6 +84,9 @@ public class QuestionsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         MainActivity.setupAppbar(true, true, false, true, "account", getString(R.string.questionsAndReplies));
         sessionManager = new SessionManager(activity);
         GlobalFunctions.hasNewNotificationsApi(activity);
@@ -97,7 +102,7 @@ public class QuestionsFragment extends Fragment {
         questionsApi();
 
         //change the color of editText in searchView
-        EditText searchEditText = (EditText) MainActivity.search.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        EditText searchEditText = (EditText) MainActivity.search.findViewById(androidx.appcompat.R.id.search_src_text);
         searchEditText.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
         searchEditText.setHintTextColor(getResources().getColor(R.color.colorPrimaryDark));
 
@@ -222,9 +227,10 @@ public class QuestionsFragment extends Fragment {
                         GlobalFunctions.EnableLayout(container);
                         if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
                             loading.setVisibility(View.GONE);
-                            Snackbar.make(loading, getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(container, getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
                         } else {
-                            GlobalFunctions.generalErrorMessage(loading, activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(container,getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -291,9 +297,10 @@ public class QuestionsFragment extends Fragment {
                     public void failure(RetrofitError error) {
                         if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
                             loading.setVisibility(View.GONE);
-                            Snackbar.make(loading, getString(R.string.noQuestions), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(container, getString(R.string.noQuestions), Snackbar.LENGTH_SHORT).show();
                         } else {
-                            GlobalFunctions.generalErrorMessage(loading, activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(container,getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -331,7 +338,8 @@ public class QuestionsFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         GlobalFunctions.EnableLayout(container);
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(container,getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -398,9 +406,10 @@ public class QuestionsFragment extends Fragment {
                     public void failure(RetrofitError error) {
                         loading.setVisibility(View.GONE);
                         if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
-                            Snackbar.make(loading, getString(R.string.noQuestions), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(container, getString(R.string.noQuestions), Snackbar.LENGTH_SHORT).show();
                         } else {
-                            GlobalFunctions.generalErrorMessage(loading, activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(container,getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -439,7 +448,8 @@ public class QuestionsFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         GlobalFunctions.EnableLayout(container);
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(container,getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 }
         );

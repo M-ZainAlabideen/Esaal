@@ -3,23 +3,20 @@ package app.esaal.adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.support.annotation.NonNull;
-import android.support.constraint.ConstraintLayout;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
 import app.esaal.MainActivity;
 import app.esaal.R;
-import app.esaal.classes.SessionManager;
 import app.esaal.fragments.AddQuestionFragment;
-import app.esaal.fragments.RegistrationFragment;
 import app.esaal.webservices.responses.subjects.Subject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -33,7 +30,6 @@ public class SubjectsAdapter extends RecyclerView.Adapter<SubjectsAdapter.viewHo
     }
 
     public class viewHolder extends RecyclerView.ViewHolder {
-
 
         @BindView(R.id.item_subject_cl_subjectBg)
         public ConstraintLayout subjectBg;

@@ -5,28 +5,29 @@ import android.app.AlertDialog;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.ViewPager;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
+
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.duolingo.open.rtlviewpager.RtlViewPager;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.Timer;
@@ -111,6 +112,9 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        if (activity == null) {
+            activity = getActivity();
+        }
         sessionManager = new SessionManager(activity);
         boolean isQuestion = false;
         if (sessionManager.isGuest()) {
@@ -167,7 +171,7 @@ public class HomeFragment extends Fragment {
 
         if (sessionManager.isLoggedIn()) {
             questionPageIndex = 1;
-            isLastPage= false;
+            isLastPage = false;
             isLoading = false;
             questionsApi();
         } else {
@@ -185,7 +189,7 @@ public class HomeFragment extends Fragment {
         }
 
         //change the color of editText in searchView
-        EditText searchEditText = (EditText) MainActivity.search.findViewById(android.support.v7.appcompat.R.id.search_src_text);
+        EditText searchEditText = (EditText) MainActivity.search.findViewById(androidx.appcompat.R.id.search_src_text);
         searchEditText.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
         searchEditText.setHintTextColor(getResources().getColor(R.color.colorPrimaryDark));
 
@@ -310,9 +314,10 @@ public class HomeFragment extends Fragment {
                         GlobalFunctions.EnableLayout(container);
                         if (error.getResponse() != null && error.getResponse().getStatus() == 202) {
                             loading.setVisibility(View.GONE);
-                            Snackbar.make(loading, getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_home_cl_outerContainer), getString(R.string.noSubjects), Snackbar.LENGTH_SHORT).show();
                         } else {
-                            GlobalFunctions.generalErrorMessage(loading, activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(activity.findViewById(R.id.fragment_home_cl_outerContainer), getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -384,9 +389,10 @@ public class HomeFragment extends Fragment {
                         GlobalFunctions.EnableLayout(container);
 
                         if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
-                            Snackbar.make(loading, getString(R.string.noQuestions), Snackbar.LENGTH_SHORT).show();
+                            Snackbar.make(activity.findViewById(R.id.fragment_home_cl_outerContainer), getString(R.string.noQuestions), Snackbar.LENGTH_SHORT).show();
                         } else {
-                            GlobalFunctions.generalErrorMessage(loading, activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(activity.findViewById(R.id.fragment_home_cl_outerContainer), getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -427,7 +433,8 @@ public class HomeFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         GlobalFunctions.EnableLayout(container);
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(activity.findViewById(R.id.fragment_home_cl_outerContainer), getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -438,7 +445,11 @@ public class HomeFragment extends Fragment {
         if (sessionManager.getUserId() == 0) {
             Navigator.loadFragment(activity, LoginFragment.newInstance(activity), R.id.activity_main_fl_container, false);
         } else {
-            Navigator.loadFragment(activity, AddQuestionFragment.newInstance(activity, "add", null), R.id.activity_main_fl_container, true);
+            if (sessionManager.hasPackage()) {
+                Navigator.loadFragment(activity, AddQuestionFragment.newInstance(activity, "add", null), R.id.activity_main_fl_container, true);
+            } else {
+                Snackbar.make(activity.findViewById(R.id.fragment_home_cl_outerContainer), getString(R.string.packageFirst), Snackbar.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -500,7 +511,8 @@ public class HomeFragment extends Fragment {
 
                     @Override
                     public void failure(RetrofitError error) {
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(activity.findViewById(R.id.fragment_home_cl_outerContainer), activity.getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -585,7 +597,8 @@ public class HomeFragment extends Fragment {
                         if (error.getResponse() != null && error.getResponse().getStatus() == 201) {
                             setupViews(false);
                         } else {
-                            GlobalFunctions.generalErrorMessage(loading, activity);
+                            loading.setVisibility(View.GONE);
+                            Snackbar.make(activity.findViewById(R.id.fragment_home_cl_outerContainer), getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -623,7 +636,8 @@ public class HomeFragment extends Fragment {
                     @Override
                     public void failure(RetrofitError error) {
                         GlobalFunctions.EnableLayout(container);
-                        GlobalFunctions.generalErrorMessage(loading, activity);
+                        loading.setVisibility(View.GONE);
+                        Snackbar.make(activity.findViewById(R.id.fragment_home_cl_outerContainer), getString(R.string.generalError), Snackbar.LENGTH_SHORT).show();
                     }
                 });
     }
