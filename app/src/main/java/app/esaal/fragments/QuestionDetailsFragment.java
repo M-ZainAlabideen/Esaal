@@ -179,6 +179,7 @@ public class QuestionDetailsFragment extends Fragment {
     }
 
     private void setData() {
+        container.setVisibility(View.VISIBLE);
         imageUrl = null;
         videoUrl = null;
         if (sessionManager.isTeacher()) {
@@ -301,14 +302,11 @@ public class QuestionDetailsFragment extends Fragment {
                     @Override
                     public void success(ArrayList<Question> questions, Response response) {
                         loading.setVisibility(View.GONE);
-                        container.setVisibility(View.VISIBLE);
                         int status = response.getStatus();
                         if (status == 200) {
                             if (questions != null && questions.size() != 0) {
                                 fragment.question = questions.get(0);
                                 setData();
-                            } else {
-                                Snackbar.make(activity.findViewById(R.id.fragment_question_details_cl_outerContainer), getString(R.string.canNotShow), Snackbar.LENGTH_SHORT).show();
                             }
                         }
                     }

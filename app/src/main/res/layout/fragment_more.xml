@@ -44,7 +44,7 @@
         app:srcCompat="@mipmap/box_more" />
 
     <ImageView
-        android:id="@+id/imageView31"
+        android:id="@+id/imageView333"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
@@ -52,6 +52,18 @@
         app:layout_constraintEnd_toEndOf="@+id/imageView33"
         app:layout_constraintStart_toStartOf="@+id/imageView33"
         app:layout_constraintTop_toBottomOf="@+id/imageView33"
+        app:srcCompat="@mipmap/box_more" />
+
+
+    <ImageView
+        android:id="@+id/imageView31"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:scaleType="centerCrop"
+        app:layout_constraintEnd_toEndOf="@+id/imageView333"
+        app:layout_constraintStart_toStartOf="@+id/imageView333"
+        app:layout_constraintTop_toBottomOf="@+id/imageView333"
         app:srcCompat="@mipmap/box_more" />
 
     <TextView
@@ -119,6 +131,30 @@
         app:layout_constraintTop_toTopOf="@+id/imageView33"
         app:srcCompat="@mipmap/arrow_more" />
 
+
+    <TextView
+        android:id="@+id/textView400"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:text="@string/terms"
+        android:textColor="@color/grayDark"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView333"
+        app:layout_constraintStart_toStartOf="@+id/imageView333"
+        app:layout_constraintTop_toTopOf="@+id/imageView333" />
+
+    <ImageView
+        android:id="@+id/fragment_more_iv_termsArrow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView333"
+        app:layout_constraintEnd_toEndOf="@+id/imageView333"
+        app:layout_constraintTop_toTopOf="@+id/imageView333"
+        app:srcCompat="@mipmap/arrow_more" />
+
+
+
     <TextView
         android:id="@+id/textView40"
         android:layout_width="wrap_content"
@@ -167,6 +203,15 @@
         app:layout_constraintEnd_toEndOf="@+id/imageView33"
         app:layout_constraintStart_toStartOf="@+id/imageView33"
         app:layout_constraintTop_toTopOf="@+id/imageView33" />
+
+    <View
+        android:id="@+id/fragment_more_v_terms"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView333"
+        app:layout_constraintEnd_toEndOf="@+id/imageView333"
+        app:layout_constraintStart_toStartOf="@+id/imageView333"
+        app:layout_constraintTop_toTopOf="@+id/imageView333" />
 
     <View
         android:id="@+id/fragment_more_v_changeLanguage"

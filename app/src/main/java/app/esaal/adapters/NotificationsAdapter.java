@@ -2,15 +2,19 @@ package app.esaal.adapters;
 
 import android.content.Context;
 import android.graphics.Typeface;
+
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import org.w3c.dom.Text;
 
@@ -22,9 +26,14 @@ import app.esaal.R;
 import app.esaal.classes.Navigator;
 import app.esaal.classes.SessionManager;
 import app.esaal.fragments.QuestionDetailsFragment;
+import app.esaal.webservices.EsaalApiConfig;
 import app.esaal.webservices.responses.notifications.Notification;
+import app.esaal.webservices.responses.questionsAndReplies.Question;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdapter.viewHolder> {
     private Context context;
@@ -85,7 +94,8 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
         }
         if (notificationsList.get(position).questionDescription != null && !notificationsList.get(position).questionDescription.isEmpty()) {
             viewHolder.description.setVisibility(View.VISIBLE);
-            viewHolder.description.setText(notificationsList.get(position).questionDescription);
+            String description = notificationsList.get(position).questionDescription;
+            viewHolder.description.setText(description);
         } else {
             viewHolder.description.setVisibility(View.GONE);
         }
@@ -95,7 +105,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             public void onClick(View v) {
                 if (notificationsList.get(position).requestQuestionId == 0) ;
                 else {
-                    Navigator.loadFragment((FragmentActivity) context, QuestionDetailsFragment.newInstance((FragmentActivity) context, notificationsList.get(position).requestQuestionId), R.id.activity_main_fl_container, true);
+                    questionByIdApi(notificationsList.get(position).requestQuestionId,viewHolder);
                 }
             }
         });
@@ -116,4 +126,32 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
     public int getItemCount() {
         return notificationsList.size();
     }
+
+    //call this api when click on notification to make sure if this question still available or not
+    private void questionByIdApi(final int questionId,NotificationsAdapter.viewHolder viewHolder) {
+        EsaalApiConfig.getCallingAPIInterface().questionById(
+                sessionManager.getUserToken(),
+                questionId,
+                sessionManager.getUserId(),
+                new Callback<ArrayList<Question>>() {
+                    @Override
+                    public void success(ArrayList<Question> questions, Response response) {
+                        int status = response.getStatus();
+                        if (status == 200) {
+                            if (questions != null && questions.size() != 0) {
+                                Navigator.loadFragment((FragmentActivity) context, QuestionDetailsFragment.newInstance((FragmentActivity) context, questionId), R.id.activity_main_fl_container, true);
+                            } else {
+                                Snackbar.make(viewHolder.details, context.getString(R.string.questionAnswered), Snackbar.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                    }
+                }
+        );
+    }
+
+
 }

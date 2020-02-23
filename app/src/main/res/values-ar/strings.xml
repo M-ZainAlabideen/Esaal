@@ -168,5 +168,7 @@
     <string name="questions">أسئلة</string>
     <string name="question">سؤال</string>
     <string name="packageFirst">ليس لديك باقة لإضافة سؤال من فضلك قم بإختيار باقة أولا</string>
-    <string name="canNotShow">لا يمكن عرض هذا السؤال في الوقت الحالي</string>
+    <string name="questionAnswered">لقد تمت الإجابة علي هذا السؤال من قبل مدرس أخر</string>
+    <string name="teacherTerms">القوانين والأحكام للمدرس :</string>
+    <string name="studentTerms">القوانين والأحكام للطالب :</string>
 </resources>

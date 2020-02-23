@@ -84,9 +84,17 @@ public class AboutUsFragment extends Fragment {
                         int status = response.getStatus();
                         if (status == 200) {
                             if (fragment.getArguments().getBoolean("isTerms")) {
-                                if (sessionManager.isTeacher()) {
-                                    setupWebView(aboutUsResponse.getTeacherTermsCondition());
+                                if (sessionManager.isGuest()) {
+                                    setupWebView(getString(R.string.teacherTerms)+"\n"+
+                                            aboutUsResponse.getTeacherTermsCondition()
+                                                    + " <br /><hr><br>" +
+                                                    getString(R.string.studentTerms)+"\n"+
+                                                     aboutUsResponse.getStudentTermsCondition()+"\n");
                                 } else {
+                                    if (sessionManager.isTeacher()) {
+                                        setupWebView(aboutUsResponse.getTeacherTermsCondition());
+                                    } else {
+                                    }
                                     setupWebView(aboutUsResponse.getStudentTermsCondition());
                                 }
                             } else {

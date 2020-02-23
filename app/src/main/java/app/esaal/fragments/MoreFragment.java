@@ -34,6 +34,8 @@ public class MoreFragment extends Fragment {
     ImageView contactUsArrow;
     @BindView(R.id.fragment_more_iv_changePasswordArrow)
     ImageView changePasswordArrow;
+    @BindView(R.id.fragment_more_iv_termsArrow)
+    ImageView termsArrow;
     @BindView(R.id.fragment_more_iv_langArrow)
     ImageView langArrow;
     @BindView(R.id.fragment_more_tv_changePasswordTxt)
@@ -67,6 +69,7 @@ public class MoreFragment extends Fragment {
             aboutUsArrow.setRotation(180);
             contactUsArrow.setRotation(180);
             changePasswordArrow.setRotation(180);
+            termsArrow.setRotation(180);
             langArrow.setRotation(180);
         }
         if(sessionManager.isGuest()){
@@ -94,6 +97,11 @@ public class MoreFragment extends Fragment {
         } else {
             Navigator.loadFragment(activity, ChangePasswordFragment.newInstance(activity), R.id.activity_main_fl_container, true);
         }
+    }
+
+    @OnClick(R.id.fragment_more_v_terms)
+    public void termsClick() {
+        Navigator.loadFragment(activity, AboutUsFragment.newInstance(activity,true), R.id.activity_main_fl_container, true);
     }
 
     @OnClick(R.id.fragment_more_v_changeLanguage)

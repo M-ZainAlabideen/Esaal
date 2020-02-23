@@ -3,6 +3,8 @@ package app.esaal.fragments;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -34,6 +36,7 @@ import com.nguyenhoanglam.imagepicker.ui.imagepicker.ImagePicker;
 import com.vincent.videocompressor.VideoCompress;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -51,6 +54,7 @@ import app.esaal.webservices.responses.subjects.Subject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import id.zelory.compressor.Compressor;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -263,8 +267,16 @@ public class AddQuestionFragment extends Fragment {
             ArrayList<Image> images = data.getParcelableArrayListExtra(Config.EXTRA_IMAGES);
             if (images != null) {
                 for (Image uri : images) {
-                    imageTypedFile = new TypedFile("image/*", new File(uri.getPath()));
-                   loadImages(uri.getPath(),imgAttach);
+
+                    //compress the image
+                    File file = new File(uri.getPath());
+                    try {
+                        file = new Compressor(activity).compressToFile(file);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    imageTypedFile = new TypedFile("image/*", new File(file.getPath()));
+                   loadImages(file.getPath(),imgAttach);
                 }
             }
         } else if (resultCode == RESULT_OK && data != null) {
